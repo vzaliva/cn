@@ -1,33 +1,38 @@
-  Cerberus
+CN
 
-Copyright (c) 2011-2022
-  Kayvan Memarian
-  Victor B. F. Gomes
-  Justus Matthiesen
-  Peter Sewell
-  Kyndylan Nienhuis
-  Stella Lau
-  Jean Pichon-Pharabod
-  Christopher Pulte
-  Rodolphe Lepigre
-  James Lingard
-  Thomas Sewell
-  Dhruv Makwana
-  Neel Krishnaswami
+Copyright (c) 2020-2025 Christopher Pulte
+Copyright (c) 2021-2025 Dhruv Makwana
+Copyright (c) 2021-2023 Thomas Sewell
+Copyright (c) 2023-2025 Rini Banerjee
+Copyright (c) 2023-2023 Neel Krishnaswami
+Copyright (c) 2024-2024 Sam Cowger
+Copyright (c) 2024-2024 Benjamin Pierce
+Copyright (c) 2024-2024 Apol Medrano
+Copyright (c) 2024-2024 Liz Austell
+Copyright (c) 2024-2025 Iavor S. Diatchki
+Copyright (c) 2024-2024 Mike Dodds
+Copyright (c) 2024-2025 Zain K Aamer
+Copyright (c) 2024-2024 James Parker
+Copyright (c) 2024-2024 Daniel Sainati
+Copyright (c) 2024-2025 Cassia Torczon
+Copyright (c) 2024-2024 Michal Podhradsky
+Copyright (c) 2024-2024 Peter Sewell
+Copyright (c) 2025-2025 Kiran Gopinathan
+Copyright (c) 2025-2025 Ethan Chou
+Copyright (c) 2025-2025 Vadim Zaliva
 
 All rights reserved.
 
-This software was developed largely within the Rigorous Engineering of
-Mainstream Systems (REMS) project at the University of Cambridge.  It
-has received funding from the European Research Council (ERC) under
-the European Union's Horizon 2020 research and innovation programme
-(grant agreement No 789108, ELVER); the EPSRC Programme Grant REMS:
-Rigorous Engineering of Mainstream Systems (EP/K008528/1); an EPSRC
-Leadership Fellowship EP/H005633 (Sewell); a Gates Cambridge
-Scholarship (Nienhuis); an MIT EECS Graduate Alumni Fellowship
-(Lau); and Google. 
+This software has received funding from the European Research Council
+(ERC) under the European Union's Horizon 2020 research and innovation
+programme from grant agreement no. 101002277 "TypeFoundry", and no. 789108,
+ERC-AdG-2017 "ELVER"; from the UK Research and Innovation (UKRI) under the
+UK government’s Horizon Europe funding guarantee for ERC-AdG-2022,
+EP/Y035976/1 "SAFER"; from a Royal Society University Research Fellowship
+URF\R1\241195 (Pulte); from an EPSRC Doctoral Training studentship;
+and from Google.
 
-Apart from the exceptions listed below, Cerberus is made available
+Apart from the exceptions listed below, CN is made available
 under the following BSD 2-clause license.
 
 Redistribution and use in source and binary forms, with or without

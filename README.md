@@ -1,252 +1,92 @@
-# Cerberus C semantics
+# CN
 
-[![CI](https://github.com/rems-project/cerberus/actions/workflows/ci.yml/badge.svg)](https://github.com/rems-project/cerberus/actions/workflows/ci.yml) [![CI-CN](https://github.com/rems-project/cerberus/actions/workflows/ci-cn.yml/badge.svg)](https://github.com/rems-project/cerberus/actions/workflows/ci-cn.yml) [![CI-CN-specs-testing](https://github.com/rems-project/cerberus/actions/workflows/ci-cn-spec-testing.yml/badge.svg)](https://github.com/rems-project/cerberus/actions/workflows/ci-cn-spec-testing.yml) [![CI-CN-becnhmarks](https://github.com/rems-project/cerberus/actions/workflows/ci-cn-bench.yml/badge.svg)](https://github.com/rems-project/cerberus/actions/workflows/ci-cn-bench.yml) [![CI-CHERI](https://github.com/rems-project/cerberus/actions/workflows/ci-cheri.yml/badge.svg)](https://github.com/rems-project/cerberus/actions/workflows/ci-cheri.yml) [![Docker](https://github.com/rems-project/cerberus/actions/workflows/docker.yml/badge.svg)](https://github.com/rems-project/cerberus/actions/workflows/docker.yml)
+CN is a tool for verifying that C code is free of undefined behaviour and meets
+user-written specifications of its ownership and functional correctness, and for translating those specifications into
+C assertions that can be checked at runtime on concrete test cases.
+It builds on the [Cerberus C semantics](https://github.com/rems-project/cerberus).
 
+## Papers
 
-Web interfaces, papers, and web page
----
 
-See <https://www.cl.cam.ac.uk/~pes20/cerberus/>.
-
-
-
-Build instructions for the CLI
----
-
-To build Cerberus, you need opam (>= 2.0.0, see [here](https://opam.ocaml.org/doc/Install.html) to install) and OCaml (>= 4.12.0).
-
-First install the dependencies (including `lem` and `menhir`) using opam:
-
-```bash
-$ opam install --deps-only ./cerberus-lib.opam ./cerberus.opam
-```
-
-Then build the CLI using:
-
-```bash
-$ make
-```
-
-The CLI can then be used either from the source directory using:
-
-```bash
-$ dune exec cerberus -- ARG1 .. ARGN
-```
-
-or, after doing `$ make install`, using the `cerberus` executable.
-
----
-To fully remove all object and Lem generated files:
-
-```
-$ make distclean
-```
-
-To remove the object files, but keep the Lem generated files (allowing for faster build when only working on `.ml` files):
-
-```
-$ make clean
-```
-
-
-Basic usage
----
-
-### Executing some translation units:
-```bash
-$ cerberus --exec file1.c ... fileN.c
-```
-This will elaborate to Core, link, look for a ```main()``` function, and start executing the Core from there. To see a printout of the return value, and to get a machine-friendly collection of stdout and stderr,
-add the ```--batch``` argument.
-
-
-### Passing command line arguments to the C program
-```bash
-$ cerberus --args="arg1","arg2" file.c
-```
-
-### Printing the intermediate representations
-* The C abstract syntax (**Cabs**) and the **Ail** intermediate representation can be printed with  ```--ast=cabs``` and ```--ast=ail```.
-
-* The **Ail** intermediate representation and the **Core** program can be pretty-printed with ```--pp=ail``` and ```--pp=core```.
-
-### Running the elaborate-and-link pipeline without executing:
-
-```bash
-$ cerberus file1.c ... fileN.c
-```
-This will elaborate the C translation units to Core programs, and link them, before returning silently.
-
-Include directories can be added with the usual ```-I```, and macros can be forwarded to the preprocessor using ```-D``` (and unset with ```-U```).
-
----
-
-For more, see `cerberus --help`
-
----
-
-Various C programs can be found in ```tests/```.
-
-
-Building Cerberus-BMC
----
-
-Install the common dependencies and the following extra ones:
-
-* angstrom  (0.15.0)
-
-```bash
-$ opam install angstrom
-```
-
-Then run:
-
-```bash
-$ make cerberus-bmc
-```
-
----
-
-To run:
-
-```bash
-$ cerberus-bmc --help
-```
-
-Building the web server
----
-
-Install the common dependencies and the following extra ones:
-
-* lwt
-* fpath           (0.7.3)
-* ezgzip          (0.2.3)
-* cohttp-lwt-unix (5.0.0)
-
-
-```bash
-$ opam install lwt fpath ezgzip cohttp-lwt-unix
-```
-
-Then:
-
-```bash
-$ make web
-```
-
-This installs all the available web instances as `webcerb.*` and the web server `cerberus-webserver`.
-
-To build the UI, install node package manager `npm` (sudo apt install nodejs npm
-) and:
-
-```bash
-$ make ui
-```
-
-Edit the generated `config.json`.
-
-Run:
-
-```bash
-$ cerberus-server --help
-```
-
-Building the abstract interpreter
----
-
-Install the common dependencies and the APRON library (tested with v0.9.12).
-
-```bash
-$ opam install apron
-```
-
-Then:
-
-```bash
-$ make absint
-```
-
-All targets
----
-
-You can also compile all the targets with:
-
-```bash
-$ make all
-```
-
-Building CN
----
-See https://github.com/rems-project/cerberus/blob/master/backend/cn/README.md
-
-
-Docker image
-------------
-
-A pre-build docker image with `cerberus` and `cn` can be downloaded with:
-
-* For the Ubuntu 22.04 based image (recommended):
-    ```bash
-    $ docker pull ghcr.io/rems-project/cerberus/cn:release
-    ```
-* For Redhat Ubi9 based image:
-    ```bash
-    $ docker pull ghcr.io/rems-project/cerberus/cn:release-redhat
-    ```
-
-For a local build, run:
-```bash
-$ docker build -t cn:release -f Dockerfile.ubuntu .
-```
-which creates a Docker image than can be used for example with:
-```bash
-$ docker run --volume `PWD`:/data/ cerberus:0.1 tests/tcc/00_assignment.c --pp=core
-```
-This image contains all the source code.
-
-
-
-People
-------
-
-Contributors:
 <ul>
-<li>  <a href="https://www.cl.cam.ac.uk/~km569">Kayvan Memarian</a></li>
-<li>  <a href="https://www.cl.cam.ac.uk/~cp526">Christopher Pulte</a></li>
-<li>  <a href="https://www.cst.cam.ac.uk/people/tals4">Thomas Sewell</a></li>
-<li>  <a href="https://www.cl.cam.ac.uk/~vb358">Victor B. F. Gomes</a></li>
-<li>  <a href="https://people.csail.mit.edu/stellal/">Stella Lau</a></li>
-<li>  <a href="https://www.cl.cam.ac.uk/~kn307/">Kyndylan Nienhuis</a></li>
-<li>  <a href="https://www.cst.cam.ac.uk/people/dcm41">Dhruv Makwana</a></li>
-<li>  <a href="http://www.cl.cam.ac.uk/~jm614">Justus Matthiesen</a></li>
-<li>  James Lingard</li>
-<li>  <a href="https://www.cl.cam.ac.uk/~dc552">David Chisnall</a></li>
-<li>  <a href="https://www.cl.cam.ac.uk/~rnw24">Robert N. M. Watson</a></li>
-<li>  <a href="https://www.cl.cam.ac.uk/~pes20">Peter Sewell</a></li>
-<li>  <a href="https://zaliva.org/">Vadim Zaliva</a></li>
+
+<li> <a name="fulminate-popl2025"></a> 
+   <a href="http://www.cl.cam.ac.uk/users/pes20/cn-testing-popl2025.pdf">Fulminate: Testing CN Separation-Logic Specifications in C</a>.
+ Rini Banerjee, Kayvan Memarian, Dhruv Makwana, Christopher Pulte, Neel Krishnaswami, and Peter Sewell.
+ In POPL 2025.
+[
+<a href="http://dx.doi.org/10.1145/3704879">doi</a>&nbsp;| 
+<a href="http://www.cl.cam.ac.uk/users/pes20/cn-testing-popl2025.pdf">pdf</a> 
+]
+</li>
+
+
+<li>
+<a name="2023-popl-cn"></a>
+<a href="http://www.cl.cam.ac.uk/users/pes20/cn-draft.pdf">CN: Verifying systems C code with separation-logic refinement types</a>.
+ Christopher Pulte, Dhruv&nbsp;C. Makwana, Thomas Sewell, Kayvan Memarian, Peter Sewell, and Neel Krishnaswami.
+ In POPL 2023.
+[
+<a href="http://dx.doi.org/10.1145/3571194">doi</a>&nbsp;| 
+<a href="https://www.cl.cam.ac.uk/~cp526/popl23.html">project page</a>&nbsp;| 
+<a href="http://www.cl.cam.ac.uk/users/pes20/cn-draft.pdf">pdf</a>
+]
+</li>
 </ul>
 
-The main Cerberus developer is Kayvan Memarian.
-Victor Gomes made substantial contributions across the system.
-Kyndylan Nienhuis worked on the operational semantics for C11 concurrency. 
-Stella Lau is the main developer of Cerberus BMC.
-The CN backend is by Christopher Pulte and Thomas Sewell.
-The CHERI memory model is by Vadim Zaliva.
-Cerberus originated with Justus Matthiesen's 2010-11 Part II project
-dissertation and his 2011-12 MPhil dissertation. James Lingard's
-2013-14 MPhil dissertation developed a certifying translation
-validator for simple C programs for the Clang front-end, w.r.t. the
-Cerberus and Vellvm semantics. 
+## Tutorial
+
+See the [tutorial documentation](https://rems-project.github.io/cn-tutorial/).
+
+## Installation
+
+Below are the installation instructions for installing CN,
+and its dependencies.
 
 
-Funding
------
-This software was developed largely within the Rigorous Engineering of
-Mainstream Systems (REMS) project at the University of Cambridge.  It
-has received funding from the European Research Council (ERC) under
-the European Union's Horizon 2020 research and innovation programme
-(grant agreement No 789108, ELVER); the EPSRC Programme Grant REMS:
-Rigorous Engineering of Mainstream Systems (EP/K008528/1); an EPSRC
-Leadership Fellowship EP/H005633 (Sewell); a Gates Cambridge
-Scholarship (Nienhuis); an MIT EECS Graduate Alumni Fellowship
-(Lau); and Google. 
+1. Install make, git, GMP library, pkg-config and either/both Z3 or CVC5.
+   On an Ubuntu system this is done via
+   ```
+   sudo apt install build-essential libgmp-dev pkg-config z3
+   ```
+   Note: there is a [known bug with Z3 version
+   4.8.13](https://github.com/rems-project/cerberus/issues/663) (the default on
+   Ubuntu 22.04) so you may wish to install Z3 via opam later for a more
+   up-to-date version. Z3 that is provided in the docker images is sufficiently up-to-date.
+
+2. Install the opam package manager for OCaml:
+   https://ocaml.org/docs/installing-ocaml#install-opam.
+   On Ubuntu, `sudo apt install opam`.
+
+3. Initialise opam with a recent version of OCaml (the CI builds with 4.14.1,
+   CN developers use 5.2.0).
+   ```
+   opam init --yes --compiler=5.2.0
+   ````
+
+4. Clone the CN repo:
+   ```
+   git clone https://github.com/rems-project/cn.git
+   ```
+
+5. For CN end users, who don't want to tinker with CN locally:
+   ```
+   opam install --yes ./cn.opam # z3 for a more recent version
+   ```
+
+6. For CN developers:
+   ```
+   opam install --deps-only ./cn.opam ocamlformat.0.26.2 # one time
+   make install # after any edits
+   ```
+   which installs CN (as both a library and an executable), and
+   dependencies.
+
+## Contributing
+
+Please see our [contributing
+guide](https://github.com/rems-project/cn/blob/main/CONTRIBUTING.md)
+for logistics and our [onboarding
+guide](https://github.com/rems-project/cn/blob/main/ONBOARDING.md)
+for learning the code base.
+

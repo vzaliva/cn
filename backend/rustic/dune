@@ -1,8 +1,0 @@
-(include_subdirs unqualified)
-
-(executable
- (name main)
- (public_name rustic)
- (package rustic)
- (flags (:standard -w -27))
- (libraries cmdliner camlp-streams str unix mem_concrete cerberus-lib.backend_common))

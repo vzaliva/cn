@@ -9,11 +9,10 @@ authors: [
   "Dhruv Makwana"
   "Rini Banerjee"
   "Zain K Aamer"
-  "Kayvan Memarian"
 ]
 license: "BSD-2-Clause"
 homepage: "https://rems-project.github.io/cn-tutorial"
-bug-reports: "https://github.com/rems-project/cerberus/issues"
+bug-reports: "https://github.com/rems-project/cn/issues"
 depends: [
   "cn"
   "coq" {>= "8.18.0"}

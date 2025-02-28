@@ -9,7 +9,7 @@ permissions:
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 env:
   CERBERUS_IMAGE_ID: ghcr.io/rems-project/cerberus/cn:release
@@ -50,13 +50,12 @@ jobs:
     - name: Install python dependencies
       run: pip install tabulate
 
-    - name: Install Cerberus
-      run: |
-        opam switch ${{ matrix.version }}
-        eval $(opam env --switch=${{ matrix.version }})
-        opam pin --yes --no-action add cerberus-lib .
-        opam pin --yes --no-action add cerberus .
-        opam install --yes cerberus
+    # - name: Install Cerberus-lib
+    #   run: |
+    #     opam switch ${{ matrix.version }}
+    #     eval $(opam env --switch=${{ matrix.version }})
+    #     opam pin --yes --no-action add cerberus-lib .
+    #     opam install --yes cerberus-lib
 
     - name: Download cvc5 release
       uses: robinraju/release-downloader@v1
@@ -98,13 +97,12 @@ jobs:
       run: |
         git checkout ${{ github.event.pull_request.base.sha }}
 
-    - name: Install Cerberus
-      run: |
-        opam switch ${{ matrix.version }}
-        eval $(opam env --switch=${{ matrix.version }})
-        opam pin --yes --no-action add cerberus-lib .
-        opam pin --yes --no-action add cerberus .
-        opam install --yes cerberus
+    # - name: Install Cerberus-lib
+    #   run: |
+    #     opam switch ${{ matrix.version }}
+    #     eval $(opam env --switch=${{ matrix.version }})
+    #     opam pin --yes --no-action add cerberus-lib .
+    #     opam install --yes cerberus-lib
 
     - name: Install CN
       run: |

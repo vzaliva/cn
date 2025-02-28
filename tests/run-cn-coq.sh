@@ -86,7 +86,7 @@ FAILED_COUNT=0
 if [ ${USE_DUNE} -eq 1 ]; then
     CN=(${WITH_CN:=dune exec cn --})
     unset CERB_INSTALL_PREFIX
-    COQ_CN_THEORIES_DIR="$(realpath "../_build/default/backend/cn/coq")"
+    COQ_CN_THEORIES_DIR="$(realpath "../_build/default/coq")"
     COQ_MAKEFILE_FLAGS="-R . Top -R ${COQ_CN_THEORIES_DIR}/Cerberus/ Cerberus -R ${COQ_CN_THEORIES_DIR}/Cn/ Cn -R ${COQ_CN_THEORIES_DIR}/Reasoning/ Reasoning"
 else
     CN=(cn)

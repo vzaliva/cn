@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
 
 env:
   CERBERUS_IMAGE_ID: ghcr.io/rems-project/cerberus/cn:release
@@ -26,7 +26,7 @@ jobs:
 
     steps:
 
-    - name: Checkout Cerberus 
+    - name: Checkout CN
       uses: actions/checkout@v4
 
     - name: System dependencies (Ubuntu)
@@ -46,7 +46,7 @@ jobs:
         opam init --yes --no-setup --shell=sh --compiler=${{ matrix.version }}
         eval $(opam env --switch=${{ matrix.version }})
         opam repo add --yes --this-switch coq-released https://coq.inria.fr/opam/released
-        opam install --deps-only --yes ./cerberus-lib.opam
+        opam install --deps-only --yes ./cn.opam
 
     - name: Save OPAM cache
       uses: actions/cache/save@v4
@@ -55,13 +55,12 @@ jobs:
         path: ~/.opam
         key: ${{ matrix.version }}
 
-    - name: Install Cerberus
-      run: |
-        opam switch ${{ matrix.version }}
-        eval $(opam env --switch=${{ matrix.version }})
-        opam pin --yes --no-action add cerberus-lib .
-        opam pin --yes --no-action add cerberus .
-        opam install --yes cerberus
+    # - name: Install Cerberus-lib
+    #   run: |
+    #     opam switch ${{ matrix.version }}
+    #     eval $(opam env --switch=${{ matrix.version }})
+    #     opam pin --yes --no-action add cerberus-lib .
+    #     opam install --yes cerberus-lib
 
     - name: Download cvc5 release
       uses: robinraju/release-downloader@v1
