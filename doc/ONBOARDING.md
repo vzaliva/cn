@@ -37,6 +37,8 @@ General principles:
 
 ## Pipeline
 
+In the Cerberus repository: (for most purposes these will not have to be changed)
+
 * Tokens: `parsers/c/tokens.ml`
 * Lexer: `parsers/c/c_lexer.mll` (may change soon)
 * Parser: `parsers/c/c_parser.mly` (ask about error messages!)
@@ -48,6 +50,9 @@ General principles:
 * Core adjustments: if you run CN with `-d N` for `N = {1,2,3}` then it will
   produce `/tmp/0__original.core`, `/tmp/1__without_unspec.core`,
   `/tmp/2__after_peval.core`, `/tmp/3__mucore.mucore`. Some of these are referred to as 'milicore'.
+
+Here:
+
 * Core to mucore: `lib/core_to_mucore.ml`
 * Mucore: This is the thing that CN typechecks.
 
@@ -97,12 +102,11 @@ with a different entry point from which a parser can be started:
 
 You can generate them using the below **from the root of the repo** and **on a working build**:
 ``` 
-[ ! -d backend/cn ] && echo "DO NOT PROCEED: Go to cerberus repo root" 
-make && make install_cn
+make install
 opam install ocaml-print-intf
 dune exec -- ocaml-print-intf lib/XXXXX.ml | sed 's/Dune__exe.//g' > XXXXX.mli
 # edit it
-make && make install_cn
+make install
 ```
 
 * If you see something like

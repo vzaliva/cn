@@ -86,7 +86,7 @@ jobs:
       run: |
         opam switch ${{ matrix.version }}
         eval $(opam env --switch=${{ matrix.version }})
-        cd backend/cn && dune build @fmt
+        dune build @fmt
 
     - name: Checkout cn-tutorial
       uses: actions/checkout@v4
