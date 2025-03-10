@@ -28,8 +28,8 @@ below](#cn-pipeline-entry)).
 
 General principles:
 
-* [Fork the repo and keep it up to date.](https://github.com/rems-project/cn/blob/main/CONTRIBUTING.md#fork-the-repo)
-* [Open PRs (even in draft state) to keep the build and CI is working.](https://github.com/rems-project/cn/blob/main/CONTRIBUTING.md#create-a-pr-and-get-it-reviewed)
+* [Fork the repo and keep it up to date.](https://github.com/rems-project/cn/blob/main/doc/CONTRIBUTING.md#fork-the-repo)
+* [Open PRs (even in draft state) to keep the build and CI is working.](https://github.com/rems-project/cn/blob/main/doc/CONTRIBUTING.md#create-a-pr-and-get-it-reviewed)
 * Make commits atomic (if it has an "and", usually split it up).
 * Make PRs logically coherent (refactoring vs new features separate).
 * As much as possible, break-up features to be reviewed piecemeal.

@@ -85,8 +85,8 @@ and its dependencies.
 ## Contributing
 
 Please see our [contributing
-guide](https://github.com/rems-project/cn/blob/main/CONTRIBUTING.md)
+guide](https://github.com/rems-project/cn/blob/main/doc/CONTRIBUTING.md)
 for logistics and our [onboarding
-guide](https://github.com/rems-project/cn/blob/main/ONBOARDING.md)
+guide](https://github.com/rems-project/cn/blob/main/doc/ONBOARDING.md)
 for learning the code base.
 
