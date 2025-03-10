@@ -60,8 +60,8 @@ module StrMap = struct
 
 
   let of_yojson
-    (value_of_yojson : Yojson.Safe.t -> ('v, string) Result.t)
-    (json : Yojson.Safe.t)
+        (value_of_yojson : Yojson.Safe.t -> ('v, string) Result.t)
+        (json : Yojson.Safe.t)
     : ('v M.t, string) Result.t
     =
     match json with
@@ -70,8 +70,8 @@ module StrMap = struct
       let elems' =
         List.map
           (fun (key, json_value) ->
-            let* value = value_of_yojson json_value in
-            Ok (key, value))
+             let* value = value_of_yojson json_value in
+             Ok (key, value))
           elems
       in
       let* bindings = sequence elems' in
@@ -838,7 +838,7 @@ let make filename source_filename_opt (report : report) =
       ~id:"pages"
       (List.map
          (fun state ->
-           make_state state report.requested report.unproven report.predicate_hints)
+            make_state state report.requested report.unproven report.predicate_hints)
          report.trace)
   in
   let file_content =

@@ -5,15 +5,7 @@
  (package cn)
  (flags
   (:standard -w @60 -open Monomorphic.Int))
- (libraries
-  cmdliner
-  cn
-  menhirLib
-  monomorphic
-  ocamlgraph
-  result
-  str
-  unix))
+ (libraries cmdliner cn menhirLib monomorphic ocamlgraph result str unix))
 
 ; There is already a Version in Cerb_frontend, but if new commits only require
 ; rebuilding the CN backend that module will be out of date.

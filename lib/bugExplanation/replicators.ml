@@ -93,9 +93,9 @@ let sprintf_to_buf (buf_sym : Sym.t) (fmt : string list) (args : string list) =
       ]
       @ List.map
           (fun e_arg ->
-            AilSexpr
-              (mk_expr
-                 (AilEcall (mk_expr (AilEident (Sym.fresh_named "free")), [ e_arg ]))))
+             AilSexpr
+               (mk_expr
+                  (AilEcall (mk_expr (AilEident (Sym.fresh_named "free")), [ e_arg ]))))
           e_args)
   in
   ([ b_buf ], s)
@@ -415,18 +415,18 @@ let rec extract_global_variables = function
 
 
 let compile_it
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (it : IT.t)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (it : IT.t)
   =
   CtA.cn_to_ail_expr sigma.cn_datatypes (extract_global_variables prog5.globs) None it
 
 
 let owned_sct_call
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (sct : Sctypes.t)
-  (pointer : IT.t)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (sct : Sctypes.t)
+      (pointer : IT.t)
   : A.bindings
     * CF.GenTypes.genTypeCategory A.statement_ list
     * CF.GenTypes.genTypeCategory A.expression
@@ -438,10 +438,10 @@ let owned_sct_call
 
 
 let compile_req
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (req : Request.t)
-  (loc : Locations.t)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (req : Request.t)
+      (loc : Locations.t)
   : A.bindings
     * CF.GenTypes.genTypeCategory A.statement_ list
     * CF.GenTypes.genTypeCategory A.expression
@@ -524,11 +524,11 @@ let compile_req
 
 
 let compile_lat
-  ?(f : 'a -> A.bindings * CF.GenTypes.genTypeCategory A.statement_ list =
-    fun _ -> ([], []))
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (lat : 'a LAT.t)
+      ?(f : 'a -> A.bindings * CF.GenTypes.genTypeCategory A.statement_ list =
+        fun _ -> ([], []))
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (lat : 'a LAT.t)
   : A.bindings * CF.GenTypes.genTypeCategory A.statement_ list
   =
   let rec aux (lat : 'a LAT.t) =
@@ -552,9 +552,9 @@ let compile_lat
 
 
 let compile_clauses
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (cls : Definition.Clause.t list)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (cls : Definition.Clause.t list)
   : A.bindings * CF.GenTypes.genTypeCategory A.statement_ list
   =
   let rec aux (cls : Definition.Clause.t list)
@@ -590,10 +590,10 @@ let compile_clauses
 
 
 let compile_pred
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (sym : Sym.t)
-  (pred : Definition.Predicate.t)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (sym : Sym.t)
+      (pred : Definition.Predicate.t)
   : A.sigma_declaration * CF.GenTypes.genTypeCategory A.sigma_function_definition
   =
   let fsym = pred_sym sym in
@@ -630,10 +630,10 @@ let compile_pred
 
 
 let compile_spec
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (sym : Sym.t)
-  (at : 'a AT.t)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (sym : Sym.t)
+      (at : 'a AT.t)
   : A.sigma_declaration * CF.GenTypes.genTypeCategory A.sigma_function_definition
   =
   let fsym = pred_sym sym in
@@ -651,20 +651,20 @@ let compile_spec
   let bs1 =
     List.map
       (fun (x, y) ->
-        Utils.create_binding y (bt_to_ctype (fst (List.assoc Sym.equal x args))))
+         Utils.create_binding y (bt_to_ctype (fst (List.assoc Sym.equal x args))))
       new_args
   in
   let ss1 =
     List.map
       (fun (x, y) ->
-        A.AilSdeclaration
-          [ ( y,
-              Some
-                (mk_expr
-                   (CtA.wrap_with_convert_to
-                      (A.AilEident x)
-                      (fst (List.assoc Sym.equal x args)))) )
-          ])
+         A.AilSdeclaration
+           [ ( y,
+               Some
+                 (mk_expr
+                    (CtA.wrap_with_convert_to
+                       (A.AilEident x)
+                       (fst (List.assoc Sym.equal x args)))) )
+           ])
       new_args
   in
   let lat =
@@ -673,7 +673,7 @@ let compile_spec
       (IT.make_subst
          (List.map
             (fun (x, y) ->
-              (x, IT.sym_ (y, fst (List.assoc Sym.equal x args), Locations.other __LOC__)))
+               (x, IT.sym_ (y, fst (List.assoc Sym.equal x args), Locations.other __LOC__)))
             new_args))
       (AT.get_lat at)
   in
@@ -788,9 +788,9 @@ let compile_spec
 
 
 let synthesize
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (insts : Executable_spec_extract.instrumentation list)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (insts : Executable_spec_extract.instrumentation list)
   : (A.sigma_declaration * CF.GenTypes.genTypeCategory A.sigma_function_definition) list
   =
   (* Per type *)

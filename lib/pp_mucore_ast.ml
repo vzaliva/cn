@@ -215,9 +215,9 @@ module PP = struct
               (P.separate_map
                  (P.comma ^^ P.space)
                  (fun (sym_opt, ty) ->
-                   (match sym_opt with None -> P.underscore | Some sym -> pp_symbol sym)
-                   ^^ P.colon
-                   ^^^ pp_ctype ty)
+                    (match sym_opt with None -> P.underscore | Some sym -> pp_symbol sym)
+                    ^^ P.colon
+                    ^^^ pp_ctype ty)
                  params)
          ^^^ P.string "->"
          ^^^ pp_ctype ty)
@@ -259,11 +259,11 @@ module PP = struct
           ( pp_field "Proc" ^^^ pp_symbol sym,
             [ dtree_of_arguments
                 (fun (body, labels, _rt) ->
-                  Dnode
-                    ( !^"proc_body",
-                      [ Dnode (pp_field ".body", [ dtree_of_expr body ]);
-                        Dnode (pp_field ".labels", dtrees_of_labels labels)
-                      ] ))
+                   Dnode
+                     ( !^"proc_body",
+                       [ Dnode (pp_field ".body", [ dtree_of_expr body ]);
+                         Dnode (pp_field ".labels", dtrees_of_labels labels)
+                       ] ))
                 args_and_body
             ] )
       | ProcDecl (_loc, _ft) ->

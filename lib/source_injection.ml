@@ -228,8 +228,8 @@ let inject st inj =
       let indented_strs =
         List.map
           (fun str ->
-            let indent = if String.contains str '{' then indent else epilogue_indent in
-            "\n" ^ indent ^ str)
+             let indent = if String.contains str '{' then indent else epilogue_indent in
+             "\n" ^ indent ^ str)
           strs
       in
       let str = List.fold_left ( ^ ) "" indented_strs in
@@ -308,19 +308,19 @@ let _posOf_stmt stmt =
 let in_stmt_injs xs num_headers =
   mapM
     (fun (loc, strs) ->
-      let* start_pos, end_pos = Pos.of_location loc in
-      let num_headers = if num_headers != 0 then num_headers + 1 else num_headers in
-      (* Printf.fprintf stderr "IN_STMT_INJS[%s], start: %s -- end: %s ---> [%s]\n"
+       let* start_pos, end_pos = Pos.of_location loc in
+       let num_headers = if num_headers != 0 then num_headers + 1 else num_headers in
+       (* Printf.fprintf stderr "IN_STMT_INJS[%s], start: %s -- end: %s ---> [%s]\n"
          (Cerb_location.location_to_string loc) (Pos.to_string start_pos) (Pos.to_string
          end_pos) (String.concat "; " (List.map (fun str -> "'" ^ String.escaped str ^
          "'") strs)); *)
-      Ok
-        { footprint =
-            { start_pos = Pos.increment_line start_pos num_headers;
-              end_pos = Pos.v (end_pos.line + num_headers) end_pos.col
-            };
-          kind = InStmt (List.length strs, String.concat "\n" strs)
-        })
+       Ok
+         { footprint =
+             { start_pos = Pos.increment_line start_pos num_headers;
+               end_pos = Pos.v (end_pos.line + num_headers) end_pos.col
+             };
+           kind = InStmt (List.length strs, String.concat "\n" strs)
+         })
     xs
 
 
@@ -404,41 +404,41 @@ let output_injections oc cn_inj =
   use_preproc_loc := cn_inj.inject_in_preproc;
   Cerb_colour.without_colour
     (fun () ->
-      let* injs =
-        List.fold_left
-          (fun acc_ (fun_sym, (loc, _, _, _, stmt)) ->
-            if not (Cerb_location.from_main_file loc) then
-              (* let () = Printf.fprintf stderr "\x1b[31mSKIPPING ==> %s\x1b[0m\n"
+       let* injs =
+         List.fold_left
+           (fun acc_ (fun_sym, (loc, _, _, _, stmt)) ->
+              if not (Cerb_location.from_main_file loc) then
+                (* let () = Printf.fprintf stderr "\x1b[31mSKIPPING ==> %s\x1b[0m\n"
                  (Cerb_location.simple_location loc) in *)
-              acc_
-            else (
-              match List.assoc_opt Symbol.equal_sym fun_sym cn_inj.pre_post with
-              | Some pre_post_strs ->
-                (match
-                   ( acc_,
-                     List.assoc
-                       Symbol.equal_sym
-                       fun_sym
-                       (snd cn_inj.program).A.declarations )
-                 with
-                 | Ok acc, (_, _, A.Decl_function (_, (_, ret_ty), _, _, _, _)) ->
-                   let is_main =
-                     match fst cn_inj.program with
-                     | Some main_sym when Symbol.equal_sym main_sym fun_sym -> true
-                     | _ -> false
-                   in
-                   let* pre, post = pre_post_injs pre_post_strs ret_ty is_main stmt in
-                   Ok (pre :: post :: acc)
-                 | _ -> assert false)
-              | None -> acc_))
-          (Ok [])
-          (snd cn_inj.program).A.function_definitions
-      in
-      let* in_stmt = in_stmt_injs cn_inj.in_stmt 0 in
-      let* rets = return_injs cn_inj.returns in
-      let injs = in_stmt @ rets @ injs in
-      ignore (inject_all oc cn_inj.filename injs);
-      Ok ())
+                acc_
+              else (
+                match List.assoc_opt Symbol.equal_sym fun_sym cn_inj.pre_post with
+                | Some pre_post_strs ->
+                  (match
+                     ( acc_,
+                       List.assoc
+                         Symbol.equal_sym
+                         fun_sym
+                         (snd cn_inj.program).A.declarations )
+                   with
+                   | Ok acc, (_, _, A.Decl_function (_, (_, ret_ty), _, _, _, _)) ->
+                     let is_main =
+                       match fst cn_inj.program with
+                       | Some main_sym when Symbol.equal_sym main_sym fun_sym -> true
+                       | _ -> false
+                     in
+                     let* pre, post = pre_post_injs pre_post_strs ret_ty is_main stmt in
+                     Ok (pre :: post :: acc)
+                   | _ -> assert false)
+                | None -> acc_))
+           (Ok [])
+           (snd cn_inj.program).A.function_definitions
+       in
+       let* in_stmt = in_stmt_injs cn_inj.in_stmt 0 in
+       let* rets = return_injs cn_inj.returns in
+       let injs = in_stmt @ rets @ injs in
+       ignore (inject_all oc cn_inj.filename injs);
+       Ok ())
     ()
 
 (* This appears to be unused:

@@ -1,6 +1,6 @@
 profile=janestreet
 ocaml-version=4.14.1
-version=0.26.2
+version=0.27.0
 
 break-before-in=fit-or-vertical
 break-cases=fit

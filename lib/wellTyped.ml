@@ -205,10 +205,10 @@ let correct_members loc (spec : (Id.t * 'a) list) (have : (Id.t * 'b) list) =
   let@ needed =
     ListM.fold_leftM
       (fun needed (id, _) ->
-        if IdSet.mem id needed then
-          return (IdSet.remove id needed)
-        else
-          fail { loc; msg = Global (Global.Unexpected_member (List.map fst spec, id)) })
+         if IdSet.mem id needed then
+           return (IdSet.remove id needed)
+         else
+           fail { loc; msg = Global (Global.Unexpected_member (List.map fst spec, id)) })
       needed
       have
   in
@@ -223,8 +223,8 @@ let correct_members_sorted_annotated loc spec have =
   let have_annotated =
     List.map2
       (fun (id, bt) (id', x) ->
-        assert (Id.equal id id');
-        (bt, (id', x)))
+         assert (Id.equal id id');
+         (bt, (id', x)))
       spec
       have
   in
@@ -255,8 +255,8 @@ module WBT = struct
         let@ members =
           ListM.mapM
             (fun (id, bt) ->
-              let@ bt = aux bt in
-              return (id, bt))
+               let@ bt = aux bt in
+               return (id, bt))
             members
         in
         assert (List.sorted_and_unique compare_by_fst_id members);
@@ -285,8 +285,8 @@ module WBT = struct
       fail
         { loc;
           msg =
-            Generic (Pp.item "no standard encoding type for constant" (Pp.z z)) [@alert
-                                                                                  "-deprecated"]
+            Generic (Pp.item "no standard encoding type for constant" (Pp.z z))
+            [@alert "-deprecated"]
         }
 end
 
@@ -330,8 +330,8 @@ module WIT = struct
       let@ args =
         ListM.mapM
           (fun (bt', (id', pat')) ->
-            let@ pat' = check_and_bind_pattern bt' pat' in
-            return (id', pat'))
+             let@ pat' = check_and_bind_pattern bt' pat' in
+             return (id', pat'))
           args_annotated
       in
       return (Pat (PConstructor (s, args), bt, loc))
@@ -377,12 +377,12 @@ module WIT = struct
           let@ dt_info = get_datatype loc s in
           ListM.iterM
             (fun constr ->
-              let@ constr_info = get_datatype_constr loc constr in
-              let relevant_cases =
-                List.filter_map (expand_constr (constr, constr_info)) cases
-              in
-              let member_bts = List.map snd constr_info.params in
-              cases_complete loc (member_bts @ bts) relevant_cases)
+               let@ constr_info = get_datatype_constr loc constr in
+               let relevant_cases =
+                 List.filter_map (expand_constr (constr, constr_info)) cases
+               in
+               let member_bts = List.map snd constr_info.params in
+               cases_complete loc (member_bts @ bts) relevant_cases)
             dt_info.constrs)
 
 
@@ -402,43 +402,43 @@ module WIT = struct
     let@ _ =
       ListM.fold_leftM
         (fun prev (Pat (_, _, pat_loc) as pat) ->
-          match List.find_opt (fun p1 -> covers p1 pat) prev with
-          | None -> return (pat :: prev)
-          | Some (Pat (case, _, p1_loc)) ->
-            let prev_head, prev_pos = Locations.head_pos_of_location p1_loc in
-            let case, sym =
-              match case with
-              | PWild -> ("wildcard", None)
-              | PSym sym -> ("variable", Some sym)
-              | PConstructor _ -> ("constructor", None)
-            in
-            let suggestion =
-              Option.(
-                value ~default:""
-                @@ map
-                     (fun sym ->
-                       let str = Sym.pp_string sym in
-                       let first_letter = String.unsafe_get str 0 in
-                       let first_upper =
-                         Char.(equal (uppercase_ascii first_letter) first_letter)
-                       in
-                       if first_upper then
-                         "\nIf this is meant to be an nullary constructor, write `"
-                         ^ str
-                         ^ " {}` instead"
-                       else
-                         "")
-                     sym)
-            in
-            let err =
-              !^"covered by previous"
-              ^^^ !^case
-              ^^^ !^"at"
-              ^^^ !^prev_head
-              ^/^ !^prev_pos
-              ^^ !^suggestion
-            in
-            fail { loc = pat_loc; msg = Redundant_pattern err })
+           match List.find_opt (fun p1 -> covers p1 pat) prev with
+           | None -> return (pat :: prev)
+           | Some (Pat (case, _, p1_loc)) ->
+             let prev_head, prev_pos = Locations.head_pos_of_location p1_loc in
+             let case, sym =
+               match case with
+               | PWild -> ("wildcard", None)
+               | PSym sym -> ("variable", Some sym)
+               | PConstructor _ -> ("constructor", None)
+             in
+             let suggestion =
+               Option.(
+                 value ~default:""
+                 @@ map
+                      (fun sym ->
+                         let str = Sym.pp_string sym in
+                         let first_letter = String.unsafe_get str 0 in
+                         let first_upper =
+                           Char.(equal (uppercase_ascii first_letter) first_letter)
+                         in
+                         if first_upper then
+                           "\nIf this is meant to be an nullary constructor, write `"
+                           ^ str
+                           ^ " {}` instead"
+                         else
+                           "")
+                      sym)
+             in
+             let err =
+               !^"covered by previous"
+               ^^^ !^case
+               ^^^ !^"at"
+               ^^^ !^prev_head
+               ^/^ !^prev_pos
+               ^^ !^suggestion
+             in
+             fail { loc = pat_loc; msg = Redundant_pattern err })
         []
         pats
     in
@@ -708,8 +708,10 @@ module WIT = struct
         let@ members_sorted =
           ListM.mapM
             (fun (id, ct) ->
-              let@ t = check loc (Memory.bt_of_sct ct) (List.assoc Id.equal id members) in
-              return (id, t))
+               let@ t =
+                 check loc (Memory.bt_of_sct ct) (List.assoc Id.equal id members)
+               in
+               return (id, t))
             decl_members
         in
         assert (List.length members_sorted = List.length members);
@@ -745,8 +747,8 @@ module WIT = struct
         let@ members =
           ListM.mapM
             (fun (id, t) ->
-              let@ t = infer t in
-              return (id, t))
+               let@ t = infer t in
+               return (id, t))
             members
         in
         let member_types = List.map (fun (id, t) -> (id, IT.get_bt t)) members in
@@ -799,8 +801,8 @@ module WIT = struct
             fail
               { loc;
                 msg =
-                  Generic !^"cast from integer not allowed in bitvector version" [@alert
-                                                                                   "-deprecated"]
+                  Generic !^"cast from integer not allowed in bitvector version"
+                  [@alert "-deprecated"]
               }
           | Loc (), Alloc_id -> return ()
           | Integer, Real -> return ()
@@ -939,7 +941,8 @@ module WIT = struct
                   Generic
                     (Pp.item
                        "array_to_list: index type disagreement"
-                       (Pp.list IT.pp_with_typ [ i; arr ])) [@alert "-deprecated"]
+                       (Pp.list IT.pp_with_typ [ i; arr ]))
+                  [@alert "-deprecated"]
               }
         in
         return (IT (ArrayToList (arr, i, len), BT.List bt, loc))
@@ -972,8 +975,8 @@ module WIT = struct
         let@ args =
           ListM.map2M
             (fun has_arg (_, def_arg_bt) ->
-              (* TODO - add location information to binders *)
-              check def.loc def_arg_bt has_arg)
+               (* TODO - add location information to binders *)
+               check def.loc def_arg_bt has_arg)
             args
             def.args
         in
@@ -991,9 +994,9 @@ module WIT = struct
         let@ args =
           ListM.mapM
             (fun (bt', (id', t')) ->
-              (* TODO - add location information to binders *)
-              let@ t' = check loc bt' t' in
-              return (id', t'))
+               (* TODO - add location information to binders *)
+               let@ t' = check loc bt' t' in
+               return (id', t'))
             args_annotated
         in
         return (IT (Constructor (s, args), Datatype info.datatype_tag, loc))
@@ -1002,12 +1005,12 @@ module WIT = struct
         let@ rbt, cases =
           ListM.fold_leftM
             (fun (rbt, acc) (pat, body) ->
-              pure
-                (let@ pat = check_and_bind_pattern (IT.get_bt e) pat in
-                 let@ body =
-                   match rbt with None -> infer body | Some rbt -> check loc rbt body
-                 in
-                 return (Some (IT.get_bt body), acc @ [ (pat, body) ])))
+               pure
+                 (let@ pat = check_and_bind_pattern (IT.get_bt e) pat in
+                  let@ body =
+                    match rbt with None -> infer body | Some rbt -> check loc rbt body
+                  in
+                  return (Some (IT.get_bt body), acc @ [ (pat, body) ])))
             (None, [])
             cases
         in
@@ -1042,10 +1045,10 @@ let quantifier_bt = BT.Bits (Unsigned, 64)
 
 (* Throws a warning when the given index term is not a `u64`. *)
 let warn_when_not_quantifier_bt
-  (ident : string)
-  (loc : Locations.t)
-  (bt : BaseTypes.t)
-  (sym : Pp.document option)
+      (ident : string)
+      (loc : Locations.t)
+      (bt : BaseTypes.t)
+      (sym : Pp.document option)
   : unit
   =
   if not (BT.equal bt quantifier_bt) then
@@ -1128,8 +1131,8 @@ module WReq = struct
             fail
               { loc;
                 msg =
-                  Generic (!^"Iteration step" ^^^ IT.pp p.step ^^^ !^"must be positive") [@alert
-                                                                                          "-deprecated"]
+                  Generic (!^"Iteration step" ^^^ IT.pp p.step ^^^ !^"must be positive")
+                  [@alert "-deprecated"]
               }
         | IT (SizeOf _, _, _) -> return step
         | IT (Cast (_, IT (SizeOf _, _, _)), _, _) -> return step
@@ -1440,8 +1443,8 @@ module BaseTyping = struct
           fail
             { loc;
               msg =
-                Generic (Pp.item "list pattern match against" (BT.pp bt)) [@alert
-                                                                            "-deprecated"]
+                Generic (Pp.item "list pattern match against" (BT.pp bt))
+                [@alert "-deprecated"]
             }
       in
       let@ ctor, pats =
@@ -1474,7 +1477,8 @@ module BaseTyping = struct
                       (Pp.item
                          (Int.to_string (List.length pats)
                           ^ "-length tuple pattern match against")
-                         (BT.pp bt)) [@alert "-deprecated"]
+                         (BT.pp bt))
+                    [@alert "-deprecated"]
                 }
           in
           let@ pats = ListM.map2M check_and_bind_pattern bts pats in
@@ -1534,7 +1538,7 @@ module BaseTyping = struct
           { loc;
             msg =
               Generic
-                (!^"Value " ^^^ Pp.z z ^^^ !^"does not fit in expected type" ^^^ BT.pp bt) 
+                (!^"Value " ^^^ Pp.z z ^^^ !^"does not fit in expected type" ^^^ BT.pp bt)
               [@alert "-deprecated"]
           }
     | _ ->
@@ -1754,8 +1758,8 @@ module BaseTyping = struct
           let@ nm_pes =
             ListM.mapM
               (fun (nm, pe) ->
-                let@ pe = infer_pexpr pe in
-                return (nm, pe))
+                 let@ pe = infer_pexpr pe in
+                 return (nm, pe))
               nm_pes
           in
           return (Struct nm, PEstruct (nm, nm_pes))
@@ -1831,8 +1835,8 @@ module BaseTyping = struct
           { loc;
             msg =
               Generic
-                (Pp.item "untypeable mucore function" (Pp_mucore_ast.pp_pexpr orig_pe)) [@alert
-                                                                                          "-deprecated"]
+                (Pp.item "untypeable mucore function" (Pp_mucore_ast.pp_pexpr orig_pe))
+              [@alert "-deprecated"]
           }
       | Some `Returns_Integer, None ->
         fail
@@ -1841,7 +1845,8 @@ module BaseTyping = struct
               Generic
                 (Pp.item
                    "mucore function requires type-annotation"
-                   (Pp_mucore_ast.pp_pexpr orig_pe)) [@alert "-deprecated"]
+                   (Pp_mucore_ast.pp_pexpr orig_pe))
+              [@alert "-deprecated"]
           }
     in
     return (bt, pexps)
@@ -2093,8 +2098,8 @@ module BaseTyping = struct
                 { loc;
                   msg =
                     Generic
-                      (Pp.item "not a function pointer at call-site" (Sctypes.pp act.ct)) [@alert
-                                                                                          "-deprecated"]
+                      (Pp.item "not a function pointer at call-site" (Sctypes.pp act.ct))
+                    [@alert "-deprecated"]
                 }
           in
           let@ f_pe = check_pexpr (Loc ()) f_pe in
@@ -2216,18 +2221,18 @@ module WProc = struct
   let label_context function_rt label_defs =
     Pmap.fold
       (fun sym def label_context ->
-        let lt, kind, loc =
-          match def with
-          | Return loc ->
-            (AT.of_rt function_rt (LAT.I False.False), CF.Annot.LAreturn, loc)
-          | Label (loc, label_args_and_body, annots, _parsed_spec, _loop_info) ->
-            let lt = WLabel.typ label_args_and_body in
-            let kind = Option.get (CF.Annot.get_label_annot annots) in
-            (lt, kind, loc)
-        in
-        (*debug 6 (lazy (!^"label type within function" ^^^ Sym.pp fsym)); debug 6 (lazy
+         let lt, kind, loc =
+           match def with
+           | Return loc ->
+             (AT.of_rt function_rt (LAT.I False.False), CF.Annot.LAreturn, loc)
+           | Label (loc, label_args_and_body, annots, _parsed_spec, _loop_info) ->
+             let lt = WLabel.typ label_args_and_body in
+             let kind = Option.get (CF.Annot.get_label_annot annots) in
+             (lt, kind, loc)
+         in
+         (*debug 6 (lazy (!^"label type within function" ^^^ Sym.pp fsym)); debug 6 (lazy
           (CF.Pp_ast.pp_doc_tree (AT.dtree False.dtree lt)));*)
-        Sym.Map.add sym (lt, kind, loc) label_context)
+         Sym.Map.add sym (lt, kind, loc) label_context)
       label_defs
       Sym.Map.empty
 
@@ -2238,29 +2243,30 @@ module WProc = struct
     fun (loc : Loc.t) (at : 'TY1 Mu.args_and_body) ->
     WArgs.welltyped
       (fun loc (body, labels, rt) ->
-        let@ rt = pure (WRT.welltyped loc rt) in
-        let label_context = label_context rt labels in
-        let@ labels =
-          PmapM.mapM
-            (fun _sym def ->
-              match def with
-              | Return loc -> return (Return loc)
-              | Label (loc, label_args_and_body, annots, parsed_spec, loop_info) ->
-                let@ label_args_and_body =
-                  pure
-                    (WArgs.welltyped
-                       (fun _loc label_body ->
-                         BaseTyping.check_expr label_context Unit label_body)
-                       "label"
-                       loc
-                       label_args_and_body)
-                in
-                return (Label (loc, label_args_and_body, annots, parsed_spec, loop_info)))
-            labels
-            Sym.compare
-        in
-        let@ body = pure (BaseTyping.check_expr label_context Unit body) in
-        return (body, labels, rt))
+         let@ rt = pure (WRT.welltyped loc rt) in
+         let label_context = label_context rt labels in
+         let@ labels =
+           PmapM.mapM
+             (fun _sym def ->
+                match def with
+                | Return loc -> return (Return loc)
+                | Label (loc, label_args_and_body, annots, parsed_spec, loop_info) ->
+                  let@ label_args_and_body =
+                    pure
+                      (WArgs.welltyped
+                         (fun _loc label_body ->
+                            BaseTyping.check_expr label_context Unit label_body)
+                         "label"
+                         loc
+                         label_args_and_body)
+                  in
+                  return
+                    (Label (loc, label_args_and_body, annots, parsed_spec, loop_info)))
+             labels
+             Sym.compare
+         in
+         let@ body = pure (BaseTyping.check_expr label_context Unit body) in
+         return (body, labels, rt))
       "function"
       loc
       at
@@ -2276,9 +2282,9 @@ module WRPD = struct
        let@ iargs =
          ListM.mapM
            (fun (s, bt) ->
-             let@ bt = WBT.is_bt loc bt in
-             let@ () = add_l s bt (loc, lazy (Pp.string "input-var")) in
-             return (s, bt))
+              let@ bt = WBT.is_bt loc bt in
+              let@ () = add_l s bt (loc, lazy (Pp.string "input-var")) in
+              return (s, bt))
            iargs
        in
        let@ oarg_bt = WBT.is_bt loc oarg_bt in
@@ -2289,17 +2295,17 @@ module WRPD = struct
            let@ clauses =
              ListM.fold_leftM
                (fun acc Def.Clause.{ loc; guard; packing_ft } ->
-                 let@ guard = WIT.check loc BT.Bool guard in
-                 pure
-                   (let@ packing_ft =
-                      WLAT.welltyped
-                        (fun loc it -> WIT.check loc oarg_bt it)
-                        IT.pp
-                        "clause"
-                        loc
-                        packing_ft
-                    in
-                    return (acc @ [ Def.Clause.{ loc; guard; packing_ft } ])))
+                  let@ guard = WIT.check loc BT.Bool guard in
+                  pure
+                    (let@ packing_ft =
+                       WLAT.welltyped
+                         (fun loc it -> WIT.check loc oarg_bt it)
+                         IT.pp
+                         "clause"
+                         loc
+                         packing_ft
+                     in
+                     return (acc @ [ Def.Clause.{ loc; guard; packing_ft } ])))
                []
                clauses
            in
@@ -2317,29 +2323,29 @@ module WRPD = struct
     let graph =
       Sym.Map.fold
         (fun p pdef graph ->
-          match pdef.Definition.Predicate.clauses with
-          | None -> graph
-          | Some clauses ->
-            List.fold_left
-              (fun graph clause ->
-                let rec aux graph packing_ft =
-                  let open LogicalArgumentTypes in
-                  match packing_ft with
-                  | Define (_, _, packing_ft) -> aux graph packing_ft
-                  | Resource ((_, (req, _)), _, packing_ft) ->
-                    let graph =
-                      match req with
-                      | P { name = Owned _; _ } | Q { name = Owned _; _ } -> graph
-                      | P { name = PName p'; _ } | Q { name = PName p'; _ } ->
-                        G.add_edge graph p p'
-                    in
-                    aux graph packing_ft
-                  | Constraint (_, _, packing_ft) -> aux graph packing_ft
-                  | I _return_value -> graph
-                in
-                aux graph clause.Definition.Clause.packing_ft)
-              graph
-              clauses)
+           match pdef.Definition.Predicate.clauses with
+           | None -> graph
+           | Some clauses ->
+             List.fold_left
+               (fun graph clause ->
+                  let rec aux graph packing_ft =
+                    let open LogicalArgumentTypes in
+                    match packing_ft with
+                    | Define (_, _, packing_ft) -> aux graph packing_ft
+                    | Resource ((_, (req, _)), _, packing_ft) ->
+                      let graph =
+                        match req with
+                        | P { name = Owned _; _ } | Q { name = Owned _; _ } -> graph
+                        | P { name = PName p'; _ } | Q { name = PName p'; _ } ->
+                          G.add_edge graph p p'
+                      in
+                      aux graph packing_ft
+                    | Constraint (_, _, packing_ft) -> aux graph packing_ft
+                    | I _return_value -> graph
+                  in
+                  aux graph clause.Definition.Clause.packing_ft)
+               graph
+               clauses)
         predicates
         graph
     in
@@ -2356,9 +2362,9 @@ module WLFD = struct
       (let@ args =
          ListM.mapM
            (fun (s, bt) ->
-             let@ bt = WBT.is_bt loc bt in
-             let@ () = add_l s bt (loc, lazy (Pp.string "arg-var")) in
-             return (s, bt))
+              let@ bt = WBT.is_bt loc bt in
+              let@ () = add_l s bt (loc, lazy (Pp.string "arg-var")) in
+              return (s, bt))
            args
        in
        let@ return_bt = WBT.is_bt loc return_bt in
@@ -2386,13 +2392,13 @@ module WLFD = struct
     let graph =
       Sym.Map.fold
         (fun fname fdef graph ->
-          let calls =
-            match fdef.body with
-            | Def body -> IT.preds_of body
-            | Rec_Def body -> IT.preds_of body
-            | Uninterp -> Sym.Set.empty
-          in
-          Sym.Set.fold (fun fname' graph -> G.add_edge graph fname fname') calls graph)
+           let calls =
+             match fdef.body with
+             | Def body -> IT.preds_of body
+             | Rec_Def body -> IT.preds_of body
+             | Uninterp -> Sym.Set.empty
+           in
+           Sym.Set.fold (fun fname' graph -> G.add_edge graph fname fname') calls graph)
         functions
         graph
     in
@@ -2418,25 +2424,25 @@ module WDT = struct
       (* all argument members disjoint *)
       ListM.fold_leftM
         (fun already (id, _) ->
-          if IdSet.mem id already then
-            (* this should have been checked earlier in compile.ml *)
-            assert false
-          else
-            return (IdSet.add id already))
+           if IdSet.mem id already then
+             (* this should have been checked earlier in compile.ml *)
+             assert false
+           else
+             return (IdSet.add id already))
         IdSet.empty
         (List.concat_map snd cases)
     in
     let@ cases =
       ListM.mapM
         (fun (c, args) ->
-          let@ args =
-            ListM.mapM
-              (fun (id, bt) ->
-                let@ bt = WBT.is_bt loc bt in
-                return (id, bt))
-              (List.sort compare_by_fst_id args)
-          in
-          return (c, args))
+           let@ args =
+             ListM.mapM
+               (fun (id, bt) ->
+                  let@ bt = WBT.is_bt loc bt in
+                  return (id, bt))
+               (List.sort compare_by_fst_id args)
+           in
+           return (c, args))
         cases
     in
     return (dt_name, { loc; cases })
@@ -2466,10 +2472,10 @@ module WDT = struct
     let graph =
       List.fold_left
         (fun graph (dt, dt_def) ->
-          List.fold_left
-            (fun graph dt' -> G.add_edge graph dt dt')
-            graph
-            (dts_in_dt_definition dt_def))
+           List.fold_left
+             (fun graph dt' -> G.add_edge graph dt dt')
+             graph
+             (dts_in_dt_definition dt_def))
         graph
         datatypes
     in
@@ -2477,39 +2483,39 @@ module WDT = struct
     let@ () =
       ListM.iterM
         (fun scc ->
-          let scc_set = Sym.Set.of_list scc in
-          ListM.iterM
-            (fun dt ->
-              let { loc; cases } = List.assoc Sym.equal dt datatypes in
-              ListM.iterM
-                (fun (_ctor, args) ->
-                  ListM.iterM
-                    (fun (id, bt) ->
-                      let indirect_deps =
-                        Sym.Set.of_list
-                          (List.filter_map BT.is_datatype_bt (BT.contained bt))
-                      in
-                      let bad = Sym.Set.inter indirect_deps scc_set in
-                      match Sym.Set.elements bad with
-                      | [] -> return ()
-                      | dt' :: _ ->
-                        let err =
-                          !^"Illegal datatype definition."
-                          ^/^ !^"Constructor argument"
-                          ^^^ squotes (Id.pp id)
-                          ^^^ !^"is given type"
-                          ^^^ squotes (BT.pp bt)
-                          ^^ comma
-                          ^^^ !^"which indirectly refers to"
-                          ^^^ squotes (BT.pp (Datatype dt'))
-                          ^^ dot
-                          ^/^ !^"Indirect recursion via map, set, record,"
-                          ^^^ !^"or tuple types is not permitted."
-                        in
-                        fail { loc; msg = Generic err [@alert "-deprecated"] })
-                    args)
-                cases)
-            scc)
+           let scc_set = Sym.Set.of_list scc in
+           ListM.iterM
+             (fun dt ->
+                let { loc; cases } = List.assoc Sym.equal dt datatypes in
+                ListM.iterM
+                  (fun (_ctor, args) ->
+                     ListM.iterM
+                       (fun (id, bt) ->
+                          let indirect_deps =
+                            Sym.Set.of_list
+                              (List.filter_map BT.is_datatype_bt (BT.contained bt))
+                          in
+                          let bad = Sym.Set.inter indirect_deps scc_set in
+                          match Sym.Set.elements bad with
+                          | [] -> return ()
+                          | dt' :: _ ->
+                            let err =
+                              !^"Illegal datatype definition."
+                              ^/^ !^"Constructor argument"
+                              ^^^ squotes (Id.pp id)
+                              ^^^ !^"is given type"
+                              ^^^ squotes (BT.pp bt)
+                              ^^ comma
+                              ^^^ !^"which indirectly refers to"
+                              ^^^ squotes (BT.pp (Datatype dt'))
+                              ^^ dot
+                              ^/^ !^"Indirect recursion via map, set, record,"
+                              ^^^ !^"or tuple types is not permitted."
+                            in
+                            fail { loc; msg = Generic err [@alert "-deprecated"] })
+                       args)
+                  cases)
+             scc)
         sccs
     in
     return sccs

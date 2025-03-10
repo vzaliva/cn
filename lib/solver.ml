@@ -66,11 +66,11 @@ end
 type solver_frame =
   { mutable commands : SMT.sexp list; (** Ack-style SMT commands, most recent first. *)
     mutable uninterpreted : SMT.sexp Sym.Map.t;
-    (** Uninterpreted functions and variables that we've declared. *)
+      (** Uninterpreted functions and variables that we've declared. *)
     mutable bt_uninterpreted : SMT.sexp Int_BT_Table.t;
-    (** Uninterpreted constants, indexed by base type. *)
+      (** Uninterpreted constants, indexed by base type. *)
     mutable ctypes : int CTypeMap.t
-    (** Declarations for C types. Each C type is assigned a unique integer. *)
+      (** Declarations for C types. Each C type is assigned a unique integer. *)
   }
 
 let empty_solver_frame () =
@@ -87,7 +87,7 @@ type solver =
   { smt_solver : SMT.solver; (** The SMT solver connection. *)
     cur_frame : solver_frame ref;
     prev_frames : solver_frame list ref;
-    (** Push/pop model. Current frame, and previous frames. *)
+      (** Push/pop model. Current frame, and previous frames. *)
     name_seed : int ref; (** Used to generate names. *)
     (* ISD: This could, perhaps, go in the frame. Then when we pop frames, we'd go back to
        the old numbers, which should be OK, I think? *)
@@ -892,13 +892,13 @@ let rec translate_term s iterm =
     let str =
       List.map
         (fun (member', sct) ->
-          let value =
-            if Id.equal member member' then
-              v
-            else
-              member_ ~member_bt:(Memory.bt_of_sct sct) (t, member') loc
-          in
-          (member', value))
+           let value =
+             if Id.equal member member' then
+               v
+             else
+               member_ ~member_bt:(Memory.bt_of_sct sct) (t, member') loc
+           in
+           (member', value))
         members
     in
     translate_term s (struct_ (tag, str) loc)
@@ -924,13 +924,13 @@ let rec translate_term s iterm =
     let str =
       List.map
         (fun (member', bt) ->
-          let value =
-            if Id.equal member member' then
-              v
-            else
-              IT (RecordMember (t, member'), bt, loc)
-          in
-          (member', value))
+           let value =
+             if Id.equal member member' then
+               v
+             else
+               IT (RecordMember (t, member'), bt, loc)
+           in
+           (member', value))
         members
     in
     translate_term s (IT (Record str, IT.get_bt t, loc))
@@ -1408,9 +1408,9 @@ module TryHard = struct
     let qs_ =
       List.map
         (fun (s, bt) ->
-          let name = CN_Names.var_name s in
-          let sort = translate_base_type bt in
-          (SMT.atom name, sort))
+           let name = CN_Names.var_name s in
+           let sort = translate_base_type bt in
+           (SMT.atom name, sort))
         qs
     in
     SMT.forall qs_ body_
@@ -1431,14 +1431,14 @@ module TryHard = struct
     let open Definition.Function in
     List.filter_map
       (fun (f, def) ->
-        match def.body with
-        | Rec_Def body ->
-          (* Normally this would require the relevant functions,
+         match def.body with
+         | Rec_Def body ->
+           (* Normally this would require the relevant functions,
              including `f`, to already have been declared. Here this
              happens lazily (in the `Apply` case), including for `f`. *)
-          Some (translate_function solver f def.args def.return_bt body)
-        | Def _ -> None
-        | Uninterp -> None)
+           Some (translate_function solver f def.args def.return_bt body)
+         | Def _ -> None
+         | Uninterp -> None)
       (Sym.Map.bindings solver.globals.logical_functions)
 
 

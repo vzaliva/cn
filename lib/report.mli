@@ -19,7 +19,7 @@ type where_report =
   { fnction : string option;
     section : string option;
     loc_cartesian : ((int * int) * (int * int)) option;
-    (** Where in the source file we are *)
+      (** Where in the source file we are *)
     loc_head : string (** Name of what we are currently processing *)
   }
 
@@ -78,7 +78,7 @@ type report =
     requested : Pp.document option; (** Resource that we failed to construct *)
     unproven : Pp.document option; (** Fact we failed to prove *)
     predicate_hints : predicate_clause_entry list
-    (** Definitions of resource predicates related to the requested one. *)
+      (** Definitions of resource predicates related to the requested one. *)
   }
 
 (** Save a report to a file.

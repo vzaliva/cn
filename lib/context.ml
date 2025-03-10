@@ -73,10 +73,10 @@ let pp_variable_bindings bindings =
 let pp_constraints constraints =
   Pp.list
     (fun lc ->
-      if !print_level >= 11 || Option.is_none (LC.is_sym_lhs_equality lc) then
-        LC.pp lc
-      else
-        parens !^"...")
+       if !print_level >= 11 || Option.is_none (LC.is_sym_lhs_equality lc) then
+         LC.pp lc
+       else
+         parens !^"...")
     (LC.Set.elements constraints)
 
 
@@ -241,13 +241,13 @@ let json (ctxt : t) : Yojson.Safe.t =
   let computational =
     List.map
       (fun (sym, (binding, _)) ->
-        `Assoc [ ("name", Sym.json sym); ("type", basetype_or_value binding) ])
+         `Assoc [ ("name", Sym.json sym); ("type", basetype_or_value binding) ])
       (Sym.Map.bindings ctxt.computational)
   in
   let logical =
     List.map
       (fun (sym, (binding, _)) ->
-        `Assoc [ ("name", Sym.json sym); ("type", basetype_or_value binding) ])
+         `Assoc [ ("name", Sym.json sym); ("type", basetype_or_value binding) ])
       (Sym.Map.bindings ctxt.logical)
   in
   let resources = List.map Res.json (get_rs ctxt) in

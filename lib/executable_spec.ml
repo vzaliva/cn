@@ -16,10 +16,10 @@ let rec group_toplevel_defs new_list = function
 
 
 let rec open_auxilliary_files
-  source_filename
-  prefix
-  included_filenames
-  already_opened_list
+          source_filename
+          prefix
+          included_filenames
+          already_opened_list
   =
   match included_filenames with
   | [] -> []
@@ -49,9 +49,9 @@ let rec open_auxilliary_files
 let filter_injs_by_filename inj_pairs fn =
   List.filter
     (fun (loc, _) ->
-      match Cerb_location.get_filename loc with
-      | Some name -> String.equal name fn
-      | None -> false)
+       match Cerb_location.get_filename loc with
+       | Some name -> String.equal name fn
+       | None -> false)
     inj_pairs
 
 
@@ -141,51 +141,51 @@ let memory_accesses_injections ail_prog =
   let xs = Ail_analysis.collect_memory_accesses ail_prog in
   List.iter
     (fun access ->
-      match access with
-      | Ail_analysis.Load { loc; _ } ->
-        let b, e = pos_bbox loc in
-        acc := (point b, [ "CN_LOAD(" ]) :: (point e, [ ")" ]) :: !acc
-      | Store { lvalue; expr; _ } ->
-        (* NOTE: we are not using the location of the access (the AilEassign), because if
+       match access with
+       | Ail_analysis.Load { loc; _ } ->
+         let b, e = pos_bbox loc in
+         acc := (point b, [ "CN_LOAD(" ]) :: (point e, [ ")" ]) :: !acc
+       | Store { lvalue; expr; _ } ->
+         (* NOTE: we are not using the location of the access (the AilEassign), because if
            in the source the assignment was surrounded by parens its location will contain
            the parens, which will break the CN_STORE macro call *)
-        let b, pos1 = pos_bbox (loc_of_expr lvalue) in
-        let pos2, e = pos_bbox (loc_of_expr expr) in
-        acc
-        := (point b, [ "CN_STORE(" ])
-           :: (region (pos1, pos2) NoCursor, [ ", " ])
-           :: (point e, [ ")" ])
-           :: !acc
-      | StoreOp { lvalue; aop; expr; _ } ->
-        let b, pos1 = pos_bbox (loc_of_expr lvalue) in
-        let pos2, e = pos_bbox (loc_of_expr expr) in
-        let op_str =
-          match aop with
-          | Mul -> "*"
-          | Div -> "/"
-          | Mod -> "%"
-          | Add -> "+"
-          | Sub -> "-"
-          | Shl -> "<<"
-          | Shr -> ">>"
-          | Band -> "&"
-          | Bxor -> "^"
-          | Bor -> "|"
-        in
-        acc
-        := (point b, [ "CN_STORE_OP(" ])
-           :: (region (pos1, pos2) NoCursor, [ "," ^ op_str ^ "," ])
-           :: (point e, [ ")" ])
-           :: !acc
-      | Postfix { loc; op; lvalue } ->
-        let op_str = match op with `Incr -> "++" | `Decr -> "--" in
-        let b, e = pos_bbox loc in
-        let pos1, pos2 = pos_bbox (loc_of_expr lvalue) in
-        (* E++ *)
-        acc
-        := (region (b, pos1) NoCursor, [ "CN_POSTFIX(" ])
-           :: (region (pos2, e) NoCursor, [ ", " ^ op_str ^ ")" ])
-           :: !acc)
+         let b, pos1 = pos_bbox (loc_of_expr lvalue) in
+         let pos2, e = pos_bbox (loc_of_expr expr) in
+         acc
+         := (point b, [ "CN_STORE(" ])
+            :: (region (pos1, pos2) NoCursor, [ ", " ])
+            :: (point e, [ ")" ])
+            :: !acc
+       | StoreOp { lvalue; aop; expr; _ } ->
+         let b, pos1 = pos_bbox (loc_of_expr lvalue) in
+         let pos2, e = pos_bbox (loc_of_expr expr) in
+         let op_str =
+           match aop with
+           | Mul -> "*"
+           | Div -> "/"
+           | Mod -> "%"
+           | Add -> "+"
+           | Sub -> "-"
+           | Shl -> "<<"
+           | Shr -> ">>"
+           | Band -> "&"
+           | Bxor -> "^"
+           | Bor -> "|"
+         in
+         acc
+         := (point b, [ "CN_STORE_OP(" ])
+            :: (region (pos1, pos2) NoCursor, [ "," ^ op_str ^ "," ])
+            :: (point e, [ ")" ])
+            :: !acc
+       | Postfix { loc; op; lvalue } ->
+         let op_str = match op with `Incr -> "++" | `Decr -> "--" in
+         let b, e = pos_bbox loc in
+         let pos1, pos2 = pos_bbox (loc_of_expr lvalue) in
+         (* E++ *)
+         acc
+         := (region (b, pos1) NoCursor, [ "CN_POSTFIX(" ])
+            :: (region (pos2, e) NoCursor, [ ", " ^ op_str ^ ")" ])
+            :: !acc)
     xs;
   !acc
 
@@ -195,18 +195,18 @@ let output_to_oc oc str_list = List.iter (Stdlib.output_string oc) str_list
 open Executable_spec_internal
 
 let main
-  ?(without_ownership_checking = false)
-  ?(without_loop_invariants = false)
-  ?(with_loop_leak_checks = false)
-  ?(with_test_gen = false)
-  ?(copy_source_dir = false)
-  filename
-  ~use_preproc
-  ((_, sigm) as ail_prog)
-  output_decorated
-  output_decorated_dir
-  prog5
-  statement_locs
+      ?(without_ownership_checking = false)
+      ?(without_loop_invariants = false)
+      ?(with_loop_leak_checks = false)
+      ?(with_test_gen = false)
+      ?(copy_source_dir = false)
+      filename
+      ~use_preproc
+      ((_, sigm) as ail_prog)
+      output_decorated
+      output_decorated_dir
+      prog5
+      statement_locs
   =
   let output_filename =
     match output_decorated with
@@ -323,7 +323,7 @@ let main
   let c_datatypes_locs_and_strs =
     List.map
       (fun ((loc, dt_str), eq_prot_str) ->
-        (loc, [ String.concat "\n" [ dt_str; eq_prot_str ] ]))
+         (loc, [ String.concat "\n" [ dt_str; eq_prot_str ] ]))
       c_datatypes_with_fn_prots
   in
   let toplevel_locs_and_defs =

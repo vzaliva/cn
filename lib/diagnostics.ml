@@ -25,11 +25,11 @@ let continue_with (opts : opt list) cfg =
   let xs =
     List.mapi
       (fun i opt ->
-        let c = String.get opt_key i in
-        let s = String.make 1 c in
-        Pp.print stdout (Pp.string (s ^ " to continue with:"));
-        Pp.print stdout opt.doc;
-        (c, opt.continue))
+         let c = String.get opt_key i in
+         let s = String.make 1 c in
+         Pp.print stdout (Pp.string (s ^ " to continue with:"));
+         Pp.print stdout opt.doc;
+         (c, opt.continue))
       opts
   in
   let next =
@@ -182,13 +182,13 @@ and investigate_eq_side _cfg (side_nm, t, t2) =
             continue_with
               (List.map
                  (fun t ->
-                   { doc = IT.pp t;
-                     continue =
-                       (fun cfg ->
-                         let eq = IT.eq_ (t, t2) @@ Locations.other __LOC__ in
-                         print stdout (bold "investigating eq:" ^^^ IT.pp eq);
-                         investigate_term cfg eq)
-                   })
+                    { doc = IT.pp t;
+                      continue =
+                        (fun cfg ->
+                          let eq = IT.eq_ (t, t2) @@ Locations.other __LOC__ in
+                          print stdout (bold "investigating eq:" ^^^ IT.pp eq);
+                          investigate_term cfg eq)
+                    })
                  xs)
         }
       ]
@@ -206,10 +206,10 @@ and investigate_trans_eq t cfg =
   let eq_xs =
     IT.fold_list
       (fun _ acc t ->
-        match IT.is_eq t with
-        | None -> acc
-        | Some (x, y) ->
-          if BT.equal (IT.get_bt x) (IT.get_bt t) then [ x; y ] @ acc else acc)
+         match IT.is_eq t with
+         | None -> acc
+         | Some (x, y) ->
+           if BT.equal (IT.get_bt x) (IT.get_bt t) then [ x; y ] @ acc else acc)
       []
       []
       cs
@@ -238,10 +238,10 @@ and get_eqs_then_investigate cfg x y =
   let x_set =
     IT.fold_list
       (fun _ acc t ->
-        if BT.equal (IT.get_bt t) (IT.get_bt x) then
-          ITSet.add t acc
-        else
-          acc)
+         if BT.equal (IT.get_bt t) (IT.get_bt x) then
+           ITSet.add t acc
+         else
+           acc)
       []
       ITSet.empty
       cs
@@ -258,10 +258,10 @@ and investigate_pred cfg nm t =
   let ps =
     IT.fold_list
       (fun _ acc t ->
-        if same_pred nm t then
-          t :: acc
-        else
-          acc)
+         if same_pred nm t then
+           t :: acc
+         else
+           acc)
       []
       []
       cs

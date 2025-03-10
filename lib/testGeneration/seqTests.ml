@@ -26,9 +26,9 @@ let save ?(perm = 0o666) (output_dir : string) (filename : string) (doc : Pp.doc
 
 
 let rec pick
-  (distribution :
-    (int * (Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list))) list)
-  (i : int)
+          (distribution :
+            (int * (Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list))) list)
+          (i : int)
   : Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list)
   =
   match distribution with
@@ -43,37 +43,37 @@ let rec ty_eq (ty1 : C.ctype) (ty2 : C.ctype) : bool =
 
 
 let callable
-  (ctx : (Sym.t * C.ctype) list)
-  ((_, (_, args)) : Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list))
+      (ctx : (Sym.t * C.ctype) list)
+      ((_, (_, args)) : Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list))
   : bool
   =
   List.for_all
     (fun x -> x)
     (List.map
        (fun (_, (ty : C.ctype)) ->
-         (match ty with
-          | Ctype (_, ty) ->
-            (match ty with
-             | Basic (Integer Char)
-             | Basic (Integer Bool)
-             | Basic (Integer (Signed _))
-             | Basic (Integer (Unsigned _))
-             | Basic (Floating _)
-             | Void ->
-               true
-             | Pointer (_, ty) -> List.exists (fun (_, ct) -> ty_eq ty ct) ctx
-             | _ -> false))
-         || List.exists (fun (_, ct) -> ty_eq ty ct) ctx)
+          (match ty with
+           | Ctype (_, ty) ->
+             (match ty with
+              | Basic (Integer Char)
+              | Basic (Integer Bool)
+              | Basic (Integer (Signed _))
+              | Basic (Integer (Unsigned _))
+              | Basic (Floating _)
+              | Void ->
+                true
+              | Pointer (_, ty) -> List.exists (fun (_, ct) -> ty_eq ty ct) ctx
+              | _ -> false))
+          || List.exists (fun (_, ct) -> ty_eq ty ct) ctx)
        args)
 
 
 let calc_score (ctx : (Sym.t * C.ctype) list) (args : (Sym.t * C.ctype) list) : int =
   List.fold_left
     (fun acc (_, ty) ->
-      if List.exists (fun (_, ct) -> ty_eq ty ct) ctx then
-        acc + 10
-      else
-        acc)
+       if List.exists (fun (_, ct) -> ty_eq ty ct) ctx then
+         acc + 10
+       else
+         acc)
     1
     args
 
@@ -84,7 +84,7 @@ let ctx_to_string (ctx : (Sym.t * C.ctype) list) : string =
     ""
     (List.map
        (fun (name, ty) ->
-         "(" ^ Sym.pp_string name ^ ":" ^ CF.String_core_ctype.string_of_ctype ty ^ ")")
+          "(" ^ Sym.pp_string name ^ ":" ^ CF.String_core_ctype.string_of_ctype ty ^ ")")
        ctx)
 
 
@@ -110,8 +110,8 @@ let gen_arg (ctx : (Sym.t * C.ctype) list) ((name, ty) : Sym.t * C.ctype) : Pp.d
     let prev_calls =
       List.filter
         (fun (_, ct) ->
-          ty_eq ty ct
-          || match ty with Ctype (_, Pointer (_, ty)) -> ty_eq ty ct | _ -> false)
+           ty_eq ty ct
+           || match ty with Ctype (_, Pointer (_, ty)) -> ty_eq ty ct | _ -> false)
         ctx
     in
     match List.length prev_calls with
@@ -139,9 +139,9 @@ let stmt_to_doc (stmt : CF.GenTypes.genTypeCategory A.statement_) : Pp.document 
 
 
 let create_test_file
-  (sequence : Pp.document)
-  (filename_base : string)
-  (fun_decls : Pp.document)
+      (sequence : Pp.document)
+      (filename_base : string)
+      (fun_decls : Pp.document)
   : Pp.document
   =
   let open Pp in
@@ -182,16 +182,16 @@ let out_to_list (command : string) =
 
 
 let rec gen_sequence
-  (funcs : (Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list)) list)
-  (fuel : int)
-  (stats : test_stats)
-  (ctx : (Sym.t * C.ctype) list)
-  (prev : int)
-  (seq_so_far : Pp.document)
-  (output_dir : string)
-  (filename_base : string)
-  (src_code : string list)
-  (fun_decls : Pp.document)
+          (funcs : (Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list)) list)
+          (fuel : int)
+          (stats : test_stats)
+          (ctx : (Sym.t * C.ctype) list)
+          (prev : int)
+          (seq_so_far : Pp.document)
+          (output_dir : string)
+          (filename_base : string)
+          (src_code : string list)
+          (fun_decls : Pp.document)
   : (Pp.document * test_stats, Pp.document * test_stats) Either.either
   =
   let max_retries = Config.get_max_backtracks () in
@@ -214,8 +214,8 @@ let rec gen_sequence
         (List.filter (callable ctx) funcs)
     in
     let rec gen_test
-      (args_map : Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list))
-      (retries_left : int)
+              (args_map : Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list))
+              (retries_left : int)
       : (SymSet.elt * C.ctype) list * int * (document, string * document) Either.either
       =
       if retries_left = 0 then
@@ -381,13 +381,13 @@ let rec gen_sequence
 
 
 let compile_sequence
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (insts : Executable_spec_extract.instrumentation list)
-  (num_samples : int)
-  (output_dir : string)
-  (filename_base : string)
-  (src_code : string list)
-  (fun_decls : Pp.document)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (insts : Executable_spec_extract.instrumentation list)
+      (num_samples : int)
+      (output_dir : string)
+      (filename_base : string)
+      (src_code : string list)
+      (fun_decls : Pp.document)
   : (Pp.document * test_stats, Pp.document * test_stats) Either.either
   =
   let fuel = num_samples in
@@ -399,20 +399,20 @@ let compile_sequence
   let args_map : (Sym.t * ((C.qualifiers * C.ctype) * (Sym.t * C.ctype) list)) list =
     List.map
       (fun (inst : Executable_spec_extract.instrumentation) ->
-        ( inst.fn,
-          let _, _, _, xs, _ = List.assoc Sym.equal inst.fn sigma.function_definitions in
-          match List.assoc Sym.equal inst.fn declarations with
-          | _, _, Decl_function (_, (qual, ret), cts, _, _, _) ->
-            ((qual, ret), List.combine xs (List.map (fun (_, ct, _) -> ct) cts))
-          | _ ->
-            failwith
-              (String.concat
-                 " "
-                 [ "Function declaration not found for";
-                   Sym.pp_string inst.fn;
-                   "@";
-                   __LOC__
-                 ]) ))
+         ( inst.fn,
+           let _, _, _, xs, _ = List.assoc Sym.equal inst.fn sigma.function_definitions in
+           match List.assoc Sym.equal inst.fn declarations with
+           | _, _, Decl_function (_, (qual, ret), cts, _, _, _) ->
+             ((qual, ret), List.combine xs (List.map (fun (_, ct, _) -> ct) cts))
+           | _ ->
+             failwith
+               (String.concat
+                  " "
+                  [ "Function declaration not found for";
+                    Sym.pp_string inst.fn;
+                    "@";
+                    __LOC__
+                  ]) ))
       insts
   in
   gen_sequence
@@ -429,10 +429,10 @@ let compile_sequence
 
 
 let generate
-  ~(output_dir : string)
-  ~(filename : string)
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (insts : Executable_spec_extract.instrumentation list)
+      ~(output_dir : string)
+      ~(filename : string)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (insts : Executable_spec_extract.instrumentation list)
   : int
   =
   if List.is_empty insts then failwith "No testable functions";
@@ -481,12 +481,12 @@ let generate
         else
           List.fold_left
             (fun acc (f, count) ->
-              acc
-              ^ Printf.sprintf
-                  "%s: %d calls (%.2f%% of calls)\n"
-                  f
-                  count
-                  (100.0 *. (float_of_int count /. float_of_int num_tests)))
+               acc
+               ^ Printf.sprintf
+                   "%s: %d calls (%.2f%% of calls)\n"
+                   f
+                   count
+                   (100.0 *. (float_of_int count /. float_of_int num_tests)))
             ""
             stats.distrib
       in

@@ -206,9 +206,9 @@ let rec get_var_cands (exp : IT.t) (candidate : IT.t)
 
 
 let rec organize_lines_aux
-  (lines : LAT.packing_ft)
-  (defs : def_line Sym.Map.t)
-  (lcs : LC.t list)
+          (lines : LAT.packing_ft)
+          (defs : def_line Sym.Map.t)
+          (lcs : LC.t list)
   : IT.t * def_line Sym.Map.t * LC.t list
   =
   match lines with
@@ -270,12 +270,12 @@ let convert_symmap_to_lcs (m : IT.t Sym.Map.t) : LogicalConstraints.t list =
 
 (* check if a candidate term could have been the output of a given predicate *)
 let rec check_pred
-  (name : Sym.t)
-  (def : Def.Predicate.t)
-  (candidate : IT.t)
-  (ctxt : C.t)
-  (iarg_vals : IT.t list)
-  (term_vals : (IT.t * IT.t) list)
+          (name : Sym.t)
+          (def : Def.Predicate.t)
+          (candidate : IT.t)
+          (ctxt : C.t)
+          (iarg_vals : IT.t list)
+          (term_vals : (IT.t * IT.t) list)
   : check_result
   =
   (* ensure candidate type matches output type of predicate *)
@@ -297,12 +297,12 @@ let rec check_pred
 
 (* check if a candidate term could have been the output of a predicate clause *)
 and check_clause
-  (c : Def.Clause.t)
-  (candidate : IT.t)
-  (ctxt : C.t)
-  (iargs : (Sym.t * BT.t) list)
-  (iarg_vals : IT.t list)
-  (term_vals : (IT.t * IT.t) list)
+      (c : Def.Clause.t)
+      (candidate : IT.t)
+      (ctxt : C.t)
+      (iargs : (Sym.t * BT.t) list)
+      (iarg_vals : IT.t list)
+      (term_vals : (IT.t * IT.t) list)
   =
   let open ResultWithData in
   let zipped = List.combine (List.map fst iargs) iarg_vals in
@@ -335,12 +335,12 @@ and check_clause
 
 (* get a list of constraints that are satisfiable iff candidate could have come from this clause body *)
 and get_body_constraints
-  (exp : IT.t)
-  (var_def_locs : def_line Sym.Map.t)
-  (candidate : IT.t)
-  (ctxt : C.t)
-  (iargs : (Sym.t * BT.t) list)
-  (term_vals : (IT.t * IT.t) list)
+      (exp : IT.t)
+      (var_def_locs : def_line Sym.Map.t)
+      (candidate : IT.t)
+      (ctxt : C.t)
+      (iargs : (Sym.t * BT.t) list)
+      (term_vals : (IT.t * IT.t) list)
   =
   let open ResultWithData in
   let f var_cands =
@@ -374,13 +374,13 @@ and get_body_constraints
 
 
 and get_var_constraints
-  (v : Sym.t)
-  (v_cand : IT.t)
-  (var_cands : IT.t Sym.Map.t)
-  (var_def_locs : def_line Sym.Map.t)
-  (ctxt : C.t)
-  (iargs : (Sym.t * BT.t) list)
-  (term_vals : (IT.t * IT.t) list)
+      (v : Sym.t)
+      (v_cand : IT.t)
+      (var_cands : IT.t Sym.Map.t)
+      (var_def_locs : def_line Sym.Map.t)
+      (ctxt : C.t)
+      (iargs : (Sym.t * BT.t) list)
+      (term_vals : (IT.t * IT.t) list)
   =
   let open Pp in
   let open ResultWithData in

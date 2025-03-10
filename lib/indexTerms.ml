@@ -97,8 +97,8 @@ let rec free_vars_bts (it : 'a annot) : BT.t Sym.Map.t =
   | Let ((nm, t1), t2) ->
     Sym.Map.union
       (fun _ bt1 bt2 ->
-        assert (BT.equal bt1 bt2);
-        Some bt1)
+         assert (BT.equal bt1 bt2);
+         Some bt1)
       (free_vars_bts t1)
       (Sym.Map.remove nm (free_vars_bts t2))
   | Match (e, cases) ->
@@ -112,8 +112,8 @@ let rec free_vars_bts (it : 'a annot) : BT.t Sym.Map.t =
         aux
           (Sym.Map.union
              (fun _ bt1 bt2 ->
-               assert (BT.equal bt1 bt2);
-               Some bt1)
+                assert (BT.equal bt1 bt2);
+                Some bt1)
              more
              acc)
           cases
@@ -126,12 +126,12 @@ and free_vars_bts_list : 'a annot list -> BT.t Sym.Map.t =
   fun xs ->
   List.fold_left
     (fun ss t ->
-      Sym.Map.union
-        (fun _ bt1 bt2 ->
-          assert (BT.equal bt1 bt2);
-          Some bt1)
-        ss
-        (free_vars_bts t))
+       Sym.Map.union
+         (fun _ bt1 bt2 ->
+            assert (BT.equal bt1 bt2);
+            Some bt1)
+         ss
+         (free_vars_bts t))
     Sym.Map.empty
     xs
 
@@ -372,8 +372,8 @@ and suitably_alpha_rename_pattern su (Pat (pat_, bt, loc), body) =
     let body, args =
       List.fold_left_map
         (fun body (id, pat') ->
-          let pat', body = suitably_alpha_rename_pattern su (pat', body) in
-          (body, (id, pat')))
+           let pat', body = suitably_alpha_rename_pattern su (pat', body) in
+           (body, (id, pat')))
         body
         args
     in
@@ -852,8 +852,8 @@ let make_array_ ~index_bt ~item_bt items (* assumed all of item_bt *) loc =
   let _, value =
     List.fold_left
       (fun (index, value) item ->
-        let index_it = num_lit_ (Z.of_int index) index_bt loc in
-        (index + 1, map_set_ value (index_it, item) loc))
+         let index_it = num_lit_ (Z.of_int index) index_bt loc in
+         (index + 1, map_set_ value (index_it, item) loc))
       (0, base_value)
       items
   in
@@ -1010,12 +1010,12 @@ let value_check mode (struct_layouts : Memory.struct_decls) ct about loc =
       and_
         (List.filter_map
            (fun piece ->
-             match piece.member_or_padding with
-             | Some (member, mct) ->
-               let member_bt = Memory.bt_of_sct mct in
-               let member_it = member_ ~member_bt (about, member) loc in
-               Some (aux mct member_it)
-             | None -> None)
+              match piece.member_or_padding with
+              | Some (member, mct) ->
+                let member_bt = Memory.bt_of_sct mct in
+                let member_it = member_ ~member_bt (about, member) loc in
+                Some (aux mct member_it)
+              | None -> None)
            (Sym.Map.find tag struct_layouts))
         loc
     | Function _ -> Cerb_debug.error "todo: function types"
@@ -1090,29 +1090,29 @@ let nth_array_to_list_facts (binders_terms : (t_bindings * t) list) =
   let nths =
     List.filter_map
       (fun (bs, it) ->
-        match get_term it with
-        | NthList (n, xs, d) -> Some (bs, (n, d, get_bt xs))
-        | _ -> None)
+         match get_term it with
+         | NthList (n, xs, d) -> Some (bs, (n, d, get_bt xs))
+         | _ -> None)
       binders_terms
   in
   let arr_lists =
     List.filter_map
       (fun (bs, it) ->
-        match get_term it with ArrayToList _ -> Some (bs, (it, get_bt it)) | _ -> None)
+         match get_term it with ArrayToList _ -> Some (bs, (it, get_bt it)) | _ -> None)
       binders_terms
   in
   List.concat_map
     (fun (bs1, (n, d, bt1)) ->
-      List.filter_map
-        (fun (bs2, (xs, bt2)) ->
-          if BT.equal bt1 bt2 then
-            wrap_bindings_match
-              (bs1 @ bs2)
-              (bool_ true here)
-              (nth_array_to_list_fact n xs d)
-          else
-            None)
-        arr_lists)
+       List.filter_map
+         (fun (bs2, (xs, bt2)) ->
+            if BT.equal bt1 bt2 then
+              wrap_bindings_match
+                (bs1 @ bs2)
+                (bool_ true here)
+                (nth_array_to_list_fact n xs d)
+            else
+              None)
+         arr_lists)
     nths
 
 
@@ -1247,15 +1247,15 @@ module Bounds = struct
       | _ ->
         Cerb_colour.with_colour
           (fun () ->
-            print_endline
-              Pp.(
-                plain
-                  (!^"unsupported type"
-                   ^^^ squotes (BT.pp bt)
-                   ^^^ !^"in permission"
-                   ^^^ squotes (pp it)
-                   ^^^ !^"at"
-                   ^^^ Locations.pp (get_loc it))))
+             print_endline
+               Pp.(
+                 plain
+                   (!^"unsupported type"
+                    ^^^ squotes (BT.pp bt)
+                    ^^^ !^"in permission"
+                    ^^^ squotes (pp it)
+                    ^^^ !^"at"
+                    ^^^ Locations.pp (get_loc it))))
           ();
         exit 2
     in
@@ -1299,15 +1299,15 @@ module Bounds = struct
       | _ ->
         Cerb_colour.with_colour
           (fun () ->
-            print_endline
-              Pp.(
-                plain
-                  (!^"unsupported type"
-                   ^^^ squotes (BT.pp bt)
-                   ^^^ !^"in permission"
-                   ^^^ squotes (pp it)
-                   ^^^ !^"at"
-                   ^^^ Locations.pp (get_loc it))))
+             print_endline
+               Pp.(
+                 plain
+                   (!^"unsupported type"
+                    ^^^ squotes (BT.pp bt)
+                    ^^^ !^"in permission"
+                    ^^^ squotes (pp it)
+                    ^^^ !^"at"
+                    ^^^ Locations.pp (get_loc it))))
           ();
         exit 2
     in

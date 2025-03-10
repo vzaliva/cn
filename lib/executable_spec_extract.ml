@@ -125,9 +125,9 @@ let from_fn (fn, decl) =
     let internal =
       ArgumentTypes.map
         (fun (body, labels, rt) ->
-          let stmts = stmts_in_expr body in
-          let loops = List.filter_map from_loop (Pmap.bindings_list labels) in
-          (rt, (stmts, loops)))
+           let stmts = stmts_in_expr body in
+           let loops = List.filter_map from_loop (Pmap.bindings_list labels) in
+           (rt, (stmts, loops)))
         args_and_body
     in
     { fn; fn_loc; internal = Some internal }

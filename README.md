@@ -76,7 +76,7 @@ and its dependencies.
 
 6. For CN developers:
    ```
-   opam install --deps-only ./cn.opam ocamlformat.0.26.2 # one time
+   opam install --deps-only ./cn.opam ocamlformat.0.27.0 # one time
    make install # after any edits
    ```
    which installs CN (as both a library and an executable), and

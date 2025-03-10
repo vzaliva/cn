@@ -31,9 +31,9 @@ let add_log_entry entry =
 let get_proof_log () = !proof_log
 
 let record_resource_inference_step
-  (c : Context.t)
-  (c' : Context.t)
-  (ri : resource_inference_type)
+      (c : Context.t)
+      (c' : Context.t)
+      (ri : resource_inference_type)
   : unit
   =
   add_log_entry (ResourceInferenceStep (c, ri, c'))

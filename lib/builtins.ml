@@ -174,10 +174,10 @@ let max_min_bits =
   let signs = [ BT.Unsigned; Signed ] in
   List.fold_left
     (fun acc sign ->
-      List.fold_left
-        (fun acc size -> max_bits_def (sign, size) :: min_bits_def (sign, size) :: acc)
-        acc
-        sizes)
+       List.fold_left
+         (fun acc size -> max_bits_def (sign, size) :: min_bits_def (sign, size) :: acc)
+         acc
+         sizes)
     []
     signs
 

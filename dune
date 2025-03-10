@@ -1,6 +1,9 @@
 ; Profiles
+
 (env
- (dev     (flags :standard -bin-annot))
- (release (flags :standard -bin-annot)))
+ (dev
+  (flags :standard -bin-annot))
+ (release
+  (flags :standard -bin-annot)))
 
 (dirs lib bin coq tools runtime)

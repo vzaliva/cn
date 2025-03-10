@@ -222,7 +222,7 @@ module Make (Config : CONFIG) = struct
       ^^ P.braces
            (comma_list
               (fun (Symbol.Identifier (_, ident), _, mval) ->
-                P.dot ^^ !^ident ^^ P.equals ^^^ Impl_mem.pp_mem_value mval)
+                 P.dot ^^ !^ident ^^ P.equals ^^^ Impl_mem.pp_mem_value mval)
               xs)
     | OVunion (tag_sym, Symbol.Identifier (_, ident), mval) ->
       P.parens (pp_const "union" ^^^ pp_raw_symbol tag_sym)
@@ -282,11 +282,11 @@ module Make (Config : CONFIG) = struct
                  ^^ P.parens
                       (comma_list
                          (fun (cs, pe) ->
-                           P.brackets
-                             (Pp_mem.pp_mem_constraint Impl_mem.pp_integer_value cs)
-                           ^^^ P.equals
-                           ^^ P.rangle
-                           ^^ pp_pexpr pe)
+                            P.brackets
+                              (Pp_mem.pp_mem_constraint Impl_mem.pp_integer_value cs)
+                            ^^^ P.equals
+                            ^^ P.rangle
+                            ^^ pp_pexpr pe)
                          xs)
                | PEsym sym -> pp_symbol sym
                | PEctor (Cnil _, _) -> P.brackets P.empty
@@ -334,7 +334,7 @@ module Make (Config : CONFIG) = struct
                  ^^ P.braces
                       (comma_list
                          (fun (Symbol.Identifier (_, ident), pe) ->
-                           P.dot ^^ !^ident ^^ P.equals ^^^ pp_pexpr pe)
+                            P.dot ^^ !^ident ^^ P.equals ^^^ pp_pexpr pe)
                          xs)
                | PEunion (tag_sym, Symbol.Identifier (_, ident), pe) ->
                  P.parens (pp_const "union" ^^^ pp_raw_symbol tag_sym)
@@ -673,57 +673,61 @@ module Make (Config : CONFIG) = struct
     let pp_cond loc d = if Cerb_location.from_main_file loc then d else P.empty in
     Pmap.fold
       (fun sym decl acc ->
-        acc
-        ^^ (match decl with
-            | ProcDecl (loc, ft) ->
-              pp_cond loc
-              @@ pp_keyword "proc"
-              ^^^ pp_symbol sym
-              ^^ Pp.colon
-              ^^^ Pp.option pp_ft "(no spec)" ft
-            | Proc { loc; args_and_body; _ } ->
-              pp_cond loc
-              @@ pp_keyword "proc"
-              ^^^ pp_symbol sym
-              ^^^ Pp.equals
-              ^^^ pp_arguments
-                    (fun (body, labels, _rt) ->
-                      P.equals
-                      ^^^ P.hardline
-                      ^^ P.nest
-                           2
-                           ((* pp label definitions *)
-                            Pmap.fold
-                              (fun sym def acc ->
-                                acc
-                                ^^ (match def with
-                                    | Return _ ->
-                                      P.break 1 ^^ !^"return label" ^^^ pp_symbol sym
-                                    | Label
-                                        (_loc, label_args_and_body, _annots, _, _loop_info)
-                                      ->
-                                      P.break 1
-                                      ^^ !^"label"
-                                      ^^^ pp_symbol sym
-                                      ^^ Pp.equals
-                                      ^^^ pp_arguments
-                                            (fun label_body ->
-                                              (* label core function definition *)
-                                              P.nest
-                                                2
-                                                (P.break 1 ^^ pp_expr budget label_body))
-                                            label_args_and_body)
-                                ^^ P.hardline)
-                              labels
-                              P.empty
-                            (* pp body *)
-                            ^^ P.break 1
-                            ^^ !^"body"
-                            ^^^ P.equals
-                            ^^^ P.nest 2 (P.break 1 ^^ pp_expr budget body)))
-                    args_and_body)
-        ^^ P.hardline
-        ^^ P.hardline)
+         acc
+         ^^ (match decl with
+             | ProcDecl (loc, ft) ->
+               pp_cond loc
+               @@ pp_keyword "proc"
+               ^^^ pp_symbol sym
+               ^^ Pp.colon
+               ^^^ Pp.option pp_ft "(no spec)" ft
+             | Proc { loc; args_and_body; _ } ->
+               pp_cond loc
+               @@ pp_keyword "proc"
+               ^^^ pp_symbol sym
+               ^^^ Pp.equals
+               ^^^ pp_arguments
+                     (fun (body, labels, _rt) ->
+                        P.equals
+                        ^^^ P.hardline
+                        ^^ P.nest
+                             2
+                             ((* pp label definitions *)
+                              Pmap.fold
+                                (fun sym def acc ->
+                                   acc
+                                   ^^ (match def with
+                                       | Return _ ->
+                                         P.break 1 ^^ !^"return label" ^^^ pp_symbol sym
+                                       | Label
+                                           ( _loc,
+                                             label_args_and_body,
+                                             _annots,
+                                             _,
+                                             _loop_info ) ->
+                                         P.break 1
+                                         ^^ !^"label"
+                                         ^^^ pp_symbol sym
+                                         ^^ Pp.equals
+                                         ^^^ pp_arguments
+                                               (fun label_body ->
+                                                  (* label core function definition *)
+                                                  P.nest
+                                                    2
+                                                    (P.break 1
+                                                     ^^ pp_expr budget label_body))
+                                               label_args_and_body)
+                                   ^^ P.hardline)
+                                labels
+                                P.empty
+                              (* pp body *)
+                              ^^ P.break 1
+                              ^^ !^"body"
+                              ^^^ P.equals
+                              ^^^ P.nest 2 (P.break 1 ^^ pp_expr budget body)))
+                     args_and_body)
+         ^^ P.hardline
+         ^^ P.hardline)
       funs
       P.empty
 
@@ -732,7 +736,7 @@ module Make (Config : CONFIG) = struct
     !^"-- Extern symbols map:" ^^ P.break 1
     |> Pmap.fold
          (fun sym_from sym_to acc ->
-           acc ^^ pp_raw_symbol sym_from ^^^ !^"->" ^^^ pp_raw_symbol sym_to ^^ P.break 1)
+            acc ^^ pp_raw_symbol sym_from ^^^ !^"->" ^^^ pp_raw_symbol sym_to ^^ P.break 1)
          symmap
 
 
@@ -743,19 +747,19 @@ module Make (Config : CONFIG) = struct
   let pp_globs budget globs =
     List.fold_left
       (fun acc (sym, decl) ->
-        match decl with
-        | GlobalDef (gt, e) ->
-          acc
-          ^^ pp_keyword "glob"
-          ^^^ pp_symbol sym
-          ^^ P.colon
-          ^^^ P.brackets (!^"ct" ^^^ P.equals ^^^ pp_ct gt)
-          ^^^ P.colon
-          ^^ P.equals
-          ^^ P.nest 2 (P.break 1 ^^ pp_expr budget e)
-          ^^ P.break 1
-          ^^ P.break 1
-        | GlobalDecl _ -> acc)
+         match decl with
+         | GlobalDef (gt, e) ->
+           acc
+           ^^ pp_keyword "glob"
+           ^^^ pp_symbol sym
+           ^^ P.colon
+           ^^^ P.brackets (!^"ct" ^^^ P.equals ^^^ pp_ct gt)
+           ^^^ P.colon
+           ^^ P.equals
+           ^^ P.nest 2 (P.break 1 ^^ pp_expr budget e)
+           ^^ P.break 1
+           ^^ P.break 1
+         | GlobalDecl _ -> acc)
       P.empty
       globs
 
@@ -826,7 +830,7 @@ module Pp_standard_typ = struct
   let pp_lt params =
     comma_list
       (fun (_, (ty, by_pointer)) ->
-        if by_pointer then pp_ctype ty else pp_ctype ty ^^^ P.parens (P.string "val"))
+         if by_pointer then pp_ctype ty else pp_ctype ty ^^^ P.parens (P.string "val"))
       params
 end
 

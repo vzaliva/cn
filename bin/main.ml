@@ -44,13 +44,13 @@ end
 open Log
 
 let frontend
-  ~macros
-  ~incl_dirs
-  ~incl_files
-  astprints
-  ~filename
-  ~magic_comment_char_dollar
-  ~save_cpp
+      ~macros
+      ~incl_dirs
+      ~incl_files
+      astprints
+      ~filename
+      ~magic_comment_char_dollar
+      ~save_cpp
   =
   let open CF in
   Cerb_global.set_cerb_conf
@@ -127,30 +127,30 @@ let check_input_file filename =
 
 
 let with_well_formedness_check
-  ~(* CLI arguments *)
-   filename
-  ~macros
-  ~incl_dirs
-  ~incl_files
-  ~coq_export_file
-  ~coq_mucore
-  ~coq_proof_log
-  ~coq_check_proof_log
-  ~csv_times
-  ~log_times
-  ~astprints
-  ~no_inherit_loc
-  ~magic_comment_char_dollar
-  ~save_cpp
-  ~(* Callbacks *)
-   handle_error
-  ~(f :
-     cabs_tunit:CF.Cabs.translation_unit ->
-     prog5:unit Mucore.file ->
-     ail_prog:CF.GenTypes.genTypeCategory A.ail_program ->
-     statement_locs:Cerb_location.t CStatements.LocMap.t ->
-     paused:_ Typing.pause ->
-     unit Or_TypeError.t)
+      ~(* CLI arguments *)
+       filename
+      ~macros
+      ~incl_dirs
+      ~incl_files
+      ~coq_export_file
+      ~coq_mucore
+      ~coq_proof_log
+      ~coq_check_proof_log
+      ~csv_times
+      ~log_times
+      ~astprints
+      ~no_inherit_loc
+      ~magic_comment_char_dollar
+      ~save_cpp
+      ~(* Callbacks *)
+       handle_error
+      ~(f :
+         cabs_tunit:CF.Cabs.translation_unit ->
+         prog5:unit Mucore.file ->
+         ail_prog:CF.GenTypes.genTypeCategory A.ail_program ->
+         statement_locs:Cerb_location.t CStatements.LocMap.t ->
+         paused:_ Typing.pause ->
+         unit Or_TypeError.t)
   =
   check_input_file filename;
   let cabs_tunit, prog, (markers_env, ail_prog), statement_locs =
@@ -187,19 +187,19 @@ let with_well_formedness_check
       let@ _ = f ~cabs_tunit ~prog5 ~ail_prog ~statement_locs ~paused in
       Option.iter
         (fun path ->
-          let prologue = Pp_mucore_coq.pp_prologue () in
-          let mucore =
-            if coq_mucore then Pp_mucore_coq.pp_unit_file prog5 else PPrint.empty
-          in
-          let proof =
-            if coq_proof_log then (
-              let steps = Prooflog.get_proof_log () in
-              Pp_mucore_coq.pp_proof_log steps coq_check_proof_log)
-            else
-              PPrint.empty
-          in
-          let doc = PPrint.( ^^ ) prologue (PPrint.( ^^ ) mucore proof) in
-          Pp.print_file path doc)
+           let prologue = Pp_mucore_coq.pp_prologue () in
+           let mucore =
+             if coq_mucore then Pp_mucore_coq.pp_unit_file prog5 else PPrint.empty
+           in
+           let proof =
+             if coq_proof_log then (
+               let steps = Prooflog.get_proof_log () in
+               Pp_mucore_coq.pp_proof_log steps coq_check_proof_log)
+             else
+               PPrint.empty
+           in
+           let doc = PPrint.( ^^ ) prologue (PPrint.( ^^ ) mucore proof) in
+           Pp.print_file path doc)
         coq_export_file;
       return ()
     in
@@ -215,11 +215,11 @@ let with_well_formedness_check
 (** Report an error on [stderr] in an appropriate format: JSON if [json] is
     true, or human-readable if not. *)
 let report_type_error
-  ~(json : bool)
-  ?(output_dir : string option)
-  ?(fn_name : string option)
-  ?(serialize_json : bool = false)
-  (error : TypeErrors.t)
+      ~(json : bool)
+      ?(output_dir : string option)
+      ?(fn_name : string option)
+      ?(serialize_json : bool = false)
+      (error : TypeErrors.t)
   : unit
   =
   if json then
@@ -248,28 +248,28 @@ let exit_code_of_errors (errors : TypeErrors.t list) : int option =
 
 (** Report the provided error, then exit. *)
 let handle_type_error
-  ~(json : bool)
-  ?(output_dir : string option)
-  ?(serialize_json : bool = false)
-  (error : TypeErrors.t)
+      ~(json : bool)
+      ?(output_dir : string option)
+      ?(serialize_json : bool = false)
+      (error : TypeErrors.t)
   =
   report_type_error ~json ?output_dir ~serialize_json error;
   exit (exit_code_of_error error)
 
 
 let well_formed
-  filename
-  macros
-  incl_dirs
-  incl_files
-  json
-  json_trace
-  output_dir
-  csv_times
-  log_times
-  astprints
-  no_inherit_loc
-  magic_comment_char_dollar
+      filename
+      macros
+      incl_dirs
+      incl_files
+      json
+      json_trace
+      output_dir
+      csv_times
+      log_times
+      astprints
+      no_inherit_loc
+      magic_comment_char_dollar
   =
   with_well_formedness_check
     ~filename
@@ -292,41 +292,41 @@ let well_formed
 
 
 let verify
-  filename
-  macros
-  incl_dirs
-  incl_files
-  loc_pp
-  debug_level
-  print_level
-  print_sym_nums
-  no_timestamps
-  json
-  json_trace
-  output_dir
-  diag
-  lemmata
-  coq_export_file
-  coq_mucore
-  coq_proof_log
-  coq_check_proof_log
-  only
-  skip
-  csv_times
-  log_times
-  solver_logging
-  solver_flags
-  solver_path
-  solver_type
-  astprints
-  dont_use_vip
-  no_use_ity
-  fail_fast
-  quiet
-  no_inherit_loc
-  magic_comment_char_dollar
-  disable_resource_derived_constraints
-  try_hard
+      filename
+      macros
+      incl_dirs
+      incl_files
+      loc_pp
+      debug_level
+      print_level
+      print_sym_nums
+      no_timestamps
+      json
+      json_trace
+      output_dir
+      diag
+      lemmata
+      coq_export_file
+      coq_mucore
+      coq_proof_log
+      coq_check_proof_log
+      only
+      skip
+      csv_times
+      log_times
+      solver_logging
+      solver_flags
+      solver_path
+      solver_type
+      astprints
+      dont_use_vip
+      no_use_ity
+      fail_fast
+      quiet
+      no_inherit_loc
+      magic_comment_char_dollar
+      disable_resource_derived_constraints
+      try_hard
   =
   if json then (
     if debug_level > 0 then
@@ -379,12 +379,12 @@ let verify
         if not quiet then
           List.iter
             (fun (fn, err) ->
-              report_type_error
-                ~json
-                ?output_dir
-                ~fn_name:fn
-                ~serialize_json:json_trace
-                err)
+               report_type_error
+                 ~json
+                 ?output_dir
+                 ~fn_name:fn
+                 ~serialize_json:json_trace
+                 err)
             errors;
         Option.fold ~none:() ~some:exit (exit_code_of_errors (List.map snd errors));
         Check.generate_lemmas lemmas lemmata
@@ -411,37 +411,37 @@ let pick_cpp_file_name outdir filename =
 
 
 let generate_executable_specs
-  filename
-  macros
-  incl_dirs
-  incl_files
-  loc_pp
-  debug_level
-  print_level
-  print_sym_nums
-  no_timestamps
-  json
-  json_trace
-  output_dir
-  diag
-  only
-  skip
-  csv_times
-  log_times
-  astprints
-  dont_use_vip
-  no_use_ity
-  fail_fast
-  no_inherit_loc
-  magic_comment_char_dollar
-  (* Executable spec *)
-    output_decorated
-  output_decorated_dir
-  without_ownership_checking
-  without_loop_invariants
-  with_loop_leak_checks
-  with_test_gen
-  copy_source_dir
+      filename
+      macros
+      incl_dirs
+      incl_files
+      loc_pp
+      debug_level
+      print_level
+      print_sym_nums
+      no_timestamps
+      json
+      json_trace
+      output_dir
+      diag
+      only
+      skip
+      csv_times
+      log_times
+      astprints
+      dont_use_vip
+      no_use_ity
+      fail_fast
+      no_inherit_loc
+      magic_comment_char_dollar
+      (* Executable spec *)
+        output_decorated
+      output_decorated_dir
+      without_ownership_checking
+      without_loop_invariants
+      with_loop_leak_checks
+      with_test_gen
+      copy_source_dir
   =
   if json then (
     if debug_level > 0 then
@@ -488,48 +488,48 @@ let generate_executable_specs
     ~f:(fun ~cabs_tunit:_ ~prog5 ~ail_prog ~statement_locs ~paused:_ ->
       Cerb_colour.without_colour
         (fun () ->
-          (try
-             Executable_spec.main
-               ~without_ownership_checking
-               ~without_loop_invariants
-               ~with_loop_leak_checks
-               ~with_test_gen
-               ~copy_source_dir
-               fi
-               ~use_preproc
-               ail_prog
-               output_decorated
-               output_decorated_dir
-               prog5
-               statement_locs
-           with
-           | e -> handle_error_with_user_guidance ~label:"CN-Exec" e);
-          Or_TypeError.return ())
+           (try
+              Executable_spec.main
+                ~without_ownership_checking
+                ~without_loop_invariants
+                ~with_loop_leak_checks
+                ~with_test_gen
+                ~copy_source_dir
+                fi
+                ~use_preproc
+                ail_prog
+                output_decorated
+                output_decorated_dir
+                prog5
+                statement_locs
+            with
+            | e -> handle_error_with_user_guidance ~label:"CN-Exec" e);
+           Or_TypeError.return ())
         ())
 
 
 let run_seq_tests
-  (* Common *)
-    filename
-  macros
-  incl_dirs
-  incl_files
-  debug_level
-  print_level
-  csv_times
-  log_times
-  astprints
-  no_inherit_loc
-  magic_comment_char_dollar
-  (* Executable spec *)
-    without_ownership_checking
-  (* without_loop_invariants *)
-  (* Test Generation *)
-    output_dir
-  with_static_hack
-  num_samples
-  backtrack_attempts
-  num_resets
+      (* Common *)
+        filename
+      macros
+      incl_dirs
+      incl_files
+      debug_level
+      print_level
+      csv_times
+      log_times
+      astprints
+      no_inherit_loc
+      magic_comment_char_dollar
+      (* Executable spec *)
+        without_ownership_checking
+      (* without_loop_invariants *)
+      (* Test Generation *)
+        output_dir
+      with_static_hack
+      num_samples
+      backtrack_attempts
+      num_resets
   =
   (* flags *)
   Cerb_debug.debug_level := debug_level;
@@ -559,98 +559,99 @@ let run_seq_tests
     ~f:(fun ~cabs_tunit ~prog5 ~ail_prog ~statement_locs ~paused:_ ->
       Cerb_colour.without_colour
         (fun () ->
-          let _, sigma = ail_prog in
-          if
-            List.is_empty
-              (TestGeneration.functions_under_test
-                 ~with_warning:true
-                 cabs_tunit
-                 sigma
-                 prog5)
-          then (
-            print_endline "No testable functions, trivially passing";
-            exit 0);
-          if not (Sys.file_exists output_dir) then (
-            print_endline ("Directory \"" ^ output_dir ^ "\" does not exist.");
-            Sys.mkdir output_dir 0o777;
-            print_endline
-              ("Created directory \"" ^ output_dir ^ "\" with full permissions."));
-          let _, sigma = ail_prog in
-          Cn_internal_to_ail.augment_record_map (BaseTypes.Record []);
-          Executable_spec.main
-            ~without_ownership_checking
-            ~without_loop_invariants:true
-            ~with_loop_leak_checks:false
-            ~with_test_gen:true
-            ~copy_source_dir:false
-            filename
-            ~use_preproc:false
-            ail_prog
-            None
-            (Some output_dir)
-            prog5
-            statement_locs;
-          let config : TestGeneration.seq_config =
-            { with_static_hack;
-              num_samples;
-              max_backtracks = backtrack_attempts;
-              num_resets
-            }
-          in
-          TestGeneration.set_seq_config config;
-          if TestGeneration.run_seq ~output_dir ~filename cabs_tunit sigma prog5 <> 0 then
-            exit 123)
+           let _, sigma = ail_prog in
+           if
+             List.is_empty
+               (TestGeneration.functions_under_test
+                  ~with_warning:true
+                  cabs_tunit
+                  sigma
+                  prog5)
+           then (
+             print_endline "No testable functions, trivially passing";
+             exit 0);
+           if not (Sys.file_exists output_dir) then (
+             print_endline ("Directory \"" ^ output_dir ^ "\" does not exist.");
+             Sys.mkdir output_dir 0o777;
+             print_endline
+               ("Created directory \"" ^ output_dir ^ "\" with full permissions."));
+           let _, sigma = ail_prog in
+           Cn_internal_to_ail.augment_record_map (BaseTypes.Record []);
+           Executable_spec.main
+             ~without_ownership_checking
+             ~without_loop_invariants:true
+             ~with_loop_leak_checks:false
+             ~with_test_gen:true
+             ~copy_source_dir:false
+             filename
+             ~use_preproc:false
+             ail_prog
+             None
+             (Some output_dir)
+             prog5
+             statement_locs;
+           let config : TestGeneration.seq_config =
+             { with_static_hack;
+               num_samples;
+               max_backtracks = backtrack_attempts;
+               num_resets
+             }
+           in
+           TestGeneration.set_seq_config config;
+           if TestGeneration.run_seq ~output_dir ~filename cabs_tunit sigma prog5 <> 0
+           then
+             exit 123)
         ();
       Or_TypeError.return ())
 
 
 let run_tests
-  (* Common *)
-    filename
-  macros
-  incl_dirs
-  incl_files
-  debug_level
-  print_level
-  csv_times
-  log_times
-  astprints
-  no_inherit_loc
-  magic_comment_char_dollar
-  (* Executable spec *)
-    without_ownership_checking
-  (* without_loop_invariants *)
-  (* Test Generation *)
-    output_dir
-  only
-  skip
-  dont_run
-  num_samples
-  max_backtracks
-  max_unfolds
-  max_array_length
-  with_static_hack
-  build_tool
-  sanitizers
-  input_timeout
-  null_in_every
-  seed
-  logging_level
-  trace_granularity
-  progress_level
-  until_timeout
-  exit_fast
-  max_stack_depth
-  allowed_depth_failures
-  max_generator_size
-  sizing_strategy
-  random_size_splits
-  allowed_size_split_backtracks
-  sized_null
-  coverage
-  disable_passes
-  trap
-  no_replicas
+      (* Common *)
+        filename
+      macros
+      incl_dirs
+      incl_files
+      debug_level
+      print_level
+      csv_times
+      log_times
+      astprints
+      no_inherit_loc
+      magic_comment_char_dollar
+      (* Executable spec *)
+        without_ownership_checking
+      (* without_loop_invariants *)
+      (* Test Generation *)
+        output_dir
+      only
+      skip
+      dont_run
+      num_samples
+      max_backtracks
+      max_unfolds
+      max_array_length
+      with_static_hack
+      build_tool
+      sanitizers
+      input_timeout
+      null_in_every
+      seed
+      logging_level
+      trace_granularity
+      progress_level
+      until_timeout
+      exit_fast
+      max_stack_depth
+      allowed_depth_failures
+      max_generator_size
+      sizing_strategy
+      random_size_splits
+      allowed_size_split_backtracks
+      sized_null
+      coverage
+      disable_passes
+      trap
+      no_replicas
   =
   (* flags *)
   Cerb_debug.debug_level := debug_level;
@@ -722,35 +723,35 @@ let run_tests
         print_endline ("Created directory \"" ^ output_dir ^ "\" with full permissions."));
       Cerb_colour.without_colour
         (fun () ->
-          Cn_internal_to_ail.augment_record_map (BaseTypes.Record []);
-          (try
-             Executable_spec.main
-               ~without_ownership_checking
-               ~without_loop_invariants:true
-               ~with_loop_leak_checks:false
-               ~with_test_gen:true
-               ~copy_source_dir:false
-               filename
-               ~use_preproc:false (* XXX *)
-               ail_prog
-               None
-               (Some output_dir)
-               prog5
-               statement_locs
-           with
-           | e -> handle_error_with_user_guidance ~label:"CN-Exec" e);
-          (try
-             TestGeneration.run
-               ~output_dir
-               ~filename
-               ~without_ownership_checking
-               cabs_tunit
-               sigma
-               prog5
-           with
-           | e -> handle_error_with_user_guidance ~label:"CN-Test-Gen" e);
-          if not dont_run then
-            Unix.execv (Filename.concat output_dir "run_tests.sh") (Array.of_list []))
+           Cn_internal_to_ail.augment_record_map (BaseTypes.Record []);
+           (try
+              Executable_spec.main
+                ~without_ownership_checking
+                ~without_loop_invariants:true
+                ~with_loop_leak_checks:false
+                ~with_test_gen:true
+                ~copy_source_dir:false
+                filename
+                ~use_preproc:false (* XXX *)
+                ail_prog
+                None
+                (Some output_dir)
+                prog5
+                statement_locs
+            with
+            | e -> handle_error_with_user_guidance ~label:"CN-Exec" e);
+           (try
+              TestGeneration.run
+                ~output_dir
+                ~filename
+                ~without_ownership_checking
+                cabs_tunit
+                sigma
+                prog5
+            with
+            | e -> handle_error_with_user_guidance ~label:"CN-Test-Gen" e);
+           if not dont_run then
+             Unix.execv (Filename.concat output_dir "run_tests.sh") (Array.of_list []))
         ();
       Or_TypeError.return ())
 

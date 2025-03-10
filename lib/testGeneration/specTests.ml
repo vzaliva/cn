@@ -32,43 +32,43 @@ let debug_stage (stage : string) (str : string) : unit =
 
 
 let compile_constant_tests
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (insts : Executable_spec_extract.instrumentation list)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (insts : Executable_spec_extract.instrumentation list)
   : Test.t list * Pp.document
   =
   let test_names, docs =
     List.map_split
       (fun (inst : Executable_spec_extract.instrumentation) ->
-        ( Test.
-            { kind = Constant;
-              suite =
-                inst.fn_loc
-                |> Cerb_location.get_filename
-                |> Option.get
-                |> Filename.basename
-                |> String.split_on_char '.'
-                |> List.hd;
-              test = Sym.pp_string inst.fn
-            },
-          let open Pp in
-          (if not (Config.with_static_hack ()) then
-             CF.Pp_ail.pp_function_prototype
-               ~executable_spec:true
-               inst.fn
-               (let _, _, decl = List.assoc Sym.equal inst.fn sigma.declarations in
-                decl)
-             ^^ hardline
-           else
-             empty)
-          ^^ CF.Pp_ail.pp_statement
-               A.(
-                 Utils.mk_stmt
-                   (AilSexpr
-                      (Utils.mk_expr
-                         (AilEcall
-                            ( Utils.mk_expr
-                                (AilEident (Sym.fresh_named "CN_UNIT_TEST_CASE")),
-                              [ Utils.mk_expr (AilEident inst.fn) ] ))))) ))
+         ( Test.
+             { kind = Constant;
+               suite =
+                 inst.fn_loc
+                 |> Cerb_location.get_filename
+                 |> Option.get
+                 |> Filename.basename
+                 |> String.split_on_char '.'
+                 |> List.hd;
+               test = Sym.pp_string inst.fn
+             },
+           let open Pp in
+           (if not (Config.with_static_hack ()) then
+              CF.Pp_ail.pp_function_prototype
+                ~executable_spec:true
+                inst.fn
+                (let _, _, decl = List.assoc Sym.equal inst.fn sigma.declarations in
+                 decl)
+              ^^ hardline
+            else
+              empty)
+           ^^ CF.Pp_ail.pp_statement
+                A.(
+                  Utils.mk_stmt
+                    (AilSexpr
+                       (Utils.mk_expr
+                          (AilEcall
+                             ( Utils.mk_expr
+                                 (AilEident (Sym.fresh_named "CN_UNIT_TEST_CASE")),
+                               [ Utils.mk_expr (AilEident inst.fn) ] ))))) ))
       insts
   in
   let open Pp in
@@ -76,9 +76,9 @@ let compile_constant_tests
 
 
 let compile_generators
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (insts : Executable_spec_extract.instrumentation list)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (insts : Executable_spec_extract.instrumentation list)
   : Pp.document
   =
   let ctx = GenCompile.compile prog5.resource_predicates insts in
@@ -110,9 +110,9 @@ let convert_from ((x, ct) : Sym.t * C.ctype) =
 
 
 let compile_random_test_case
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  ((test, inst) : Test.t * Executable_spec_extract.instrumentation)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      ((test, inst) : Test.t * Executable_spec_extract.instrumentation)
   : Pp.document
   =
   let open Pp in
@@ -142,9 +142,9 @@ let compile_random_test_case
     in
     List.map
       (fun sym ->
-        match List.assoc Sym.equal sym prog5.globs with
-        | GlobalDecl sct -> (sym, sct)
-        | GlobalDef (sct, _) -> (sym, sct))
+         match List.assoc Sym.equal sym prog5.globs with
+         | GlobalDecl sct -> (sym, sct)
+         | GlobalDef (sct, _) -> (sym, sct))
       global_syms
   in
   (if not (Config.with_static_hack ()) then
@@ -178,33 +178,34 @@ let compile_random_test_case
                  ^^ separate_map
                       hardline
                       (fun (sym, sct) ->
-                        let ty =
-                          CF.Pp_ail.pp_ctype
-                            ~executable_spec:true
-                            ~is_human:false
-                            C.no_qualifiers
-                            (Sctypes.to_ctype sct)
-                        in
-                        Sym.pp sym
-                        ^^ space
-                        ^^ equals
-                        ^^ space
-                        ^^ star
-                        ^^ parens (ty ^^ star)
-                        ^^ string "convert_from_cn_pointer"
-                        ^^ parens
-                             (string "res->" ^^ Sym.pp (GenUtils.get_mangled_name [ sym ]))
-                        ^^ semi
-                        ^^ hardline
-                        ^^ string "cn_assume_ownership"
-                        ^^ parens
-                             (separate
-                                (comma ^^ space)
-                                [ ampersand ^^ Sym.pp sym;
-                                  string "sizeof" ^^ parens ty;
-                                  string "(char*)" ^^ dquotes init_name
-                                ])
-                        ^^ semi)
+                         let ty =
+                           CF.Pp_ail.pp_ctype
+                             ~executable_spec:true
+                             ~is_human:false
+                             C.no_qualifiers
+                             (Sctypes.to_ctype sct)
+                         in
+                         Sym.pp sym
+                         ^^ space
+                         ^^ equals
+                         ^^ space
+                         ^^ star
+                         ^^ parens (ty ^^ star)
+                         ^^ string "convert_from_cn_pointer"
+                         ^^ parens
+                              (string "res->"
+                               ^^ Sym.pp (GenUtils.get_mangled_name [ sym ]))
+                         ^^ semi
+                         ^^ hardline
+                         ^^ string "cn_assume_ownership"
+                         ^^ parens
+                              (separate
+                                 (comma ^^ space)
+                                 [ ampersand ^^ Sym.pp sym;
+                                   string "sizeof" ^^ parens ty;
+                                   string "(char*)" ^^ dquotes init_name
+                                 ])
+                         ^^ semi)
                       globals)
               ^^ hardline)
         ^^ twice hardline
@@ -222,25 +223,25 @@ let compile_random_test_case
 
 
 let compile_generator_tests
-  (sigma : CF.GenTypes.genTypeCategory A.sigma)
-  (prog5 : unit Mucore.file)
-  (insts : Executable_spec_extract.instrumentation list)
+      (sigma : CF.GenTypes.genTypeCategory A.sigma)
+      (prog5 : unit Mucore.file)
+      (insts : Executable_spec_extract.instrumentation list)
   : Test.t list * Pp.document
   =
   let tests =
     List.map
       (fun (inst : Executable_spec_extract.instrumentation) ->
-        Test.
-          { kind = Generator;
-            suite =
-              inst.fn_loc
-              |> Cerb_location.get_filename
-              |> Option.get
-              |> Filename.basename
-              |> String.split_on_char '.'
-              |> List.hd;
-            test = Sym.pp_string inst.fn
-          })
+         Test.
+           { kind = Generator;
+             suite =
+               inst.fn_loc
+               |> Cerb_location.get_filename
+               |> Option.get
+               |> Filename.basename
+               |> String.split_on_char '.'
+               |> List.hd;
+             test = Sym.pp_string inst.fn
+           })
       insts
   in
   let open Pp in

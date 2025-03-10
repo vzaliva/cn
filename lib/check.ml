@@ -68,8 +68,8 @@ let rec check_and_match_pattern (Mu.Pattern (loc, _, bty, pattern)) it =
        let@ all_as =
          ListM.mapiM
            (fun i p ->
-             let ith = Simplify.IndexTerms.tuple_nth_reduce it i (Mu.bt_of_pattern p) in
-             check_and_match_pattern p ith)
+              let ith = Simplify.IndexTerms.tuple_nth_reduce it i (Mu.bt_of_pattern p) in
+              check_and_match_pattern p ith)
            pats
        in
        return (List.concat all_as)
@@ -96,9 +96,9 @@ let check_ptrval (loc : Locations.t) ~(expect : BT.t) (ptrval : pointer_value) :
   CF.Impl_mem.case_ptrval
     ptrval
     (fun ct ->
-      let sct = Sctypes.of_ctype_unsafe loc ct in
-      let@ () = WellTyped.check_ct loc sct in
-      return (IT.null_ loc))
+       let sct = Sctypes.of_ctype_unsafe loc ct in
+       let@ () = WellTyped.check_ct loc sct in
+       return (IT.null_ loc))
     (function
       | None ->
         (* FIXME(CHERI merge) *)
@@ -111,12 +111,12 @@ let check_ptrval (loc : Locations.t) ~(expect : BT.t) (ptrval : pointer_value) :
         let here = Locations.other __LOC__ in
         return (sym_ (sym, BT.(Loc ()), here)))
     (fun prov p ->
-      let@ alloc_id =
-        match prov with
-        | Some id -> return id
-        | None -> fail (fun _ -> { loc; msg = Empty_provenance })
-      in
-      return (pointer_ ~alloc_id ~addr:p loc))
+       let@ alloc_id =
+         match prov with
+         | Some id -> return id
+         | None -> fail (fun _ -> { loc; msg = Empty_provenance })
+       in
+       return (pointer_ ~alloc_id ~addr:p loc))
 
 
 let expect_must_be_map_bt loc ~expect =
@@ -131,38 +131,38 @@ let rec check_mem_value (loc : Locations.t) ~(expect : BT.t) (mem : mem_value) :
   CF.Impl_mem.case_mem_value
     mem
     (fun ct ->
-      let@ () = WellTyped.check_ct loc (Sctypes.of_ctype_unsafe loc ct) in
-      fail (fun _ -> { loc; msg = Unspecified ct }))
+       let@ () = WellTyped.check_ct loc (Sctypes.of_ctype_unsafe loc ct) in
+       fail (fun _ -> { loc; msg = Unspecified ct }))
     (fun _ _ -> unsupported loc !^"infer_mem_value: concurrent read case")
     (fun ity iv ->
-      let@ () = WellTyped.check_ct loc (Integer ity) in
-      let bt = Memory.bt_of_sct (Integer ity) in
-      let@ () = WellTyped.ensure_base_type loc ~expect bt in
-      return (int_lit_ (Memory.int_of_ival iv) bt loc))
+       let@ () = WellTyped.check_ct loc (Integer ity) in
+       let bt = Memory.bt_of_sct (Integer ity) in
+       let@ () = WellTyped.ensure_base_type loc ~expect bt in
+       return (int_lit_ (Memory.int_of_ival iv) bt loc))
     (fun _ft _fv -> unsupported loc !^"floats")
     (fun ct ptrval ->
-      (* TODO: do anything else with ct? *)
-      let@ () = WellTyped.check_ct loc (Sctypes.of_ctype_unsafe loc ct) in
-      check_ptrval loc ~expect ptrval)
+       (* TODO: do anything else with ct? *)
+       let@ () = WellTyped.check_ct loc (Sctypes.of_ctype_unsafe loc ct) in
+       check_ptrval loc ~expect ptrval)
     (fun mem_values ->
-      let@ index_bt, item_bt = expect_must_be_map_bt loc ~expect in
-      assert (Option.is_some (BT.is_bits_bt index_bt));
-      let@ values = ListM.mapM (check_mem_value loc ~expect:item_bt) mem_values in
-      return (make_array_ ~index_bt ~item_bt values loc))
+       let@ index_bt, item_bt = expect_must_be_map_bt loc ~expect in
+       assert (Option.is_some (BT.is_bits_bt index_bt));
+       let@ values = ListM.mapM (check_mem_value loc ~expect:item_bt) mem_values in
+       return (make_array_ ~index_bt ~item_bt values loc))
     (fun tag mvals ->
-      let@ () = WellTyped.check_ct loc (Struct tag) in
-      let@ () = WellTyped.ensure_base_type loc ~expect (Struct tag) in
-      let mvals =
-        List.map (fun (id, ct, mv) -> (id, Sctypes.of_ctype_unsafe loc ct, mv)) mvals
-      in
-      check_struct loc tag mvals)
+       let@ () = WellTyped.check_ct loc (Struct tag) in
+       let@ () = WellTyped.ensure_base_type loc ~expect (Struct tag) in
+       let mvals =
+         List.map (fun (id, ct, mv) -> (id, Sctypes.of_ctype_unsafe loc ct, mv)) mvals
+       in
+       check_struct loc tag mvals)
     (fun tag id mv -> check_union loc tag id mv)
 
 
 and check_struct
-  (loc : Locations.t)
-  (tag : Sym.t)
-  (member_values : (Id.t * Sctypes.t * mem_value) list)
+      (loc : Locations.t)
+      (tag : Sym.t)
+      (member_values : (Id.t * Sctypes.t * mem_value) list)
   : IT.t m
   =
   let@ layout = Global.get_struct_decl loc tag in
@@ -175,8 +175,8 @@ and check_struct
   let@ member_its =
     ListM.mapM
       (fun (member, sct, mv) ->
-        let@ member_lvt = check_mem_value loc ~expect:(Memory.bt_of_sct sct) mv in
-        return (member, member_lvt))
+         let@ member_lvt = check_mem_value loc ~expect:(Memory.bt_of_sct sct) mv in
+         return (member, member_lvt))
       member_values
   in
   return (IT.struct_ (tag, member_its) loc)
@@ -215,7 +215,8 @@ let rec check_object_value (loc : Locations.t) (Mu.OV (expect, ov)) : IT.t m =
           msg =
             Generic
               (!^"integer literal not representable at type"
-               ^^^ Pp.typ (Pp.z z) (BT.pp expect)) [@alert "-deprecated"]
+               ^^^ Pp.typ (Pp.z z) (BT.pp expect))
+            [@alert "-deprecated"]
         })
   | OVpointer p -> check_ptrval loc ~expect p
   | OVarray items ->
@@ -224,7 +225,7 @@ let rec check_object_value (loc : Locations.t) (Mu.OV (expect, ov)) : IT.t m =
     let@ () =
       ListM.iterM
         (fun i ->
-          WellTyped.ensure_base_type loc ~expect:item_bt (Mu.bt_of_object_value i))
+           WellTyped.ensure_base_type loc ~expect:item_bt (Mu.bt_of_object_value i))
         items
     in
     let@ values = ListM.mapM (check_object_value loc) items in
@@ -386,7 +387,8 @@ let known_function_pointer loc p =
           Generic
             (Pp.item
                "function pointer must be provably equal to a defined function"
-               (IT.pp p)) [@alert "-deprecated"]
+               (IT.pp p))
+          [@alert "-deprecated"]
       })
 
 
@@ -780,7 +782,7 @@ let rec check_pexpr (pe : BT.t Mu.pexpr) (k : IT.t -> unit m) : unit m =
              { loc;
                msg =
                  Generic
-                   (Pp.item "untypeable mucore function" (Pp_mucore_ast.pp_pexpr orig_pe)) 
+                   (Pp.item "untypeable mucore function" (Pp_mucore_ast.pp_pexpr orig_pe))
                  [@alert "-deprecated"]
              })
        in
@@ -807,11 +809,11 @@ let rec check_pexpr (pe : BT.t Mu.pexpr) (k : IT.t -> unit m) : unit m =
        let@ _ =
          ListM.map2M
            (fun (id, ct) (id', pe') ->
-             assert (Id.equal id id');
-             WellTyped.ensure_base_type
-               loc
-               ~expect:(Memory.bt_of_sct ct)
-               (Mu.bt_of_pexpr pe'))
+              assert (Id.equal id id');
+              WellTyped.ensure_base_type
+                loc
+                ~expect:(Memory.bt_of_sct ct)
+                (Mu.bt_of_pexpr pe'))
            member_types
            xs
        in
@@ -836,8 +838,8 @@ let rec check_pexpr (pe : BT.t Mu.pexpr) (k : IT.t -> unit m) : unit m =
            fail (fun _ ->
              { loc;
                msg =
-                 Generic (!^"unsupported c-type in sig of:" ^^^ Sym.pp sym) [@alert
-                                                                              "-deprecated"]
+                 Generic (!^"unsupported c-type in sig of:" ^^^ Sym.pp sym)
+                 [@alert "-deprecated"]
              }))
      | PEmemberof _ -> Cerb_debug.error "todo: PEmemberof"
      | PEbool_to_integer pe ->
@@ -1165,9 +1167,9 @@ let filter_empty_resources loc =
     map_and_fold_resources
       loc
       (fun resource xs ->
-        match Pack.resource_empty provable resource with
-        | `Empty -> (Deleted, xs)
-        | `NonEmpty (constr, model) -> (Unchanged, (resource, constr, model) :: xs))
+         match Pack.resource_empty provable resource with
+         | `Empty -> (Deleted, xs)
+         | `NonEmpty (constr, model) -> (Unchanged, (resource, constr, model) :: xs))
       []
   in
   return filtered
@@ -1196,13 +1198,13 @@ let compute_used loc (prev_rs, prev_ix) (post_rs, _) =
   in
   ListM.fold_leftM
     (fun (rs, ws) (r, i) ->
-      let@ h = res_history loc i in
-      if h.last_written_id >= prev_ix then
-        return (rs, (r, h, i) :: ws)
-      else if h.last_read_id >= prev_ix then
-        return ((r, h, i) :: rs, ws)
-      else
-        return (rs, ws))
+       let@ h = res_history loc i in
+       if h.last_written_id >= prev_ix then
+         return (rs, (r, h, i) :: ws)
+       else if h.last_read_id >= prev_ix then
+         return ((r, h, i) :: rs, ws)
+       else
+         return (rs, ws))
     ([], [])
     all_rs
 
@@ -1233,7 +1235,8 @@ let _check_used_distinct loc used =
                      ^^^ break 1
                      ^^^ render_upd h
                      ^^^ break 1
-                     ^^^ render_upd h2)) [@alert "-deprecated"]
+                     ^^^ render_upd h2))
+               [@alert "-deprecated"]
            }))
   in
   let@ w_map = check_ws IntMap.empty (List.concat (List.map snd used)) in
@@ -1252,7 +1255,8 @@ let _check_used_distinct loc used =
                   ^^^ break 1
                   ^^^ render_read h
                   ^^^ break 1
-                  ^^^ render_upd h2)) [@alert "-deprecated"]
+                  ^^^ render_upd h2))
+            [@alert "-deprecated"]
         })
   in
   ListM.iterM check_rd (List.concat (List.map fst used))
@@ -1300,11 +1304,11 @@ let instantiate loc filter arg =
     ();
   List.iteri
     (fun i ((_, bt), _) ->
-      if i < 2 then
-        Pp.warn
-          loc
-          (!^"did not instantiate on basetype mismatch:"
-           ^^^ Pp.list BT.pp [ bt; IT.get_bt arg_it ]))
+       if i < 2 then
+         Pp.warn
+           loc
+           (!^"did not instantiate on basetype mismatch:"
+            ^^^ Pp.list BT.pp [ bt; IT.get_bt arg_it ]))
     type_mismatch;
   add_cs loc extra_assumptions
 
@@ -1795,8 +1799,8 @@ let rec check_expr labels (e : BT.t Mu.expr) (k : IT.t -> unit m) : unit m =
              fail (fun _ ->
                { loc;
                  msg =
-                   Generic (!^"Call to function with no spec:" ^^^ Sym.pp fsym) [@alert
-                                                                                  "-deprecated"]
+                   Generic (!^"Call to function with no spec:" ^^^ Sym.pp fsym)
+                   [@alert "-deprecated"]
                })
          in
          (* checks pes against their annotations, and that they match ft's argument types *)
@@ -2032,7 +2036,7 @@ let rec check_expr labels (e : BT.t Mu.expr) (k : IT.t -> unit m) : unit m =
            let@ args =
              ListM.map2M
                (fun has_arg (_, def_arg_bt) ->
-                 WellTyped.check_term loc def_arg_bt has_arg)
+                  WellTyped.check_term loc def_arg_bt has_arg)
                args
                def.args
            in
@@ -2100,8 +2104,8 @@ let rec check_expr labels (e : BT.t Mu.expr) (k : IT.t -> unit m) : unit m =
                   fail (fun _ ->
                     { loc;
                       msg =
-                        Generic !^"Cannot split on forall condition" [@alert
-                                                                       "-deprecated"]
+                        Generic !^"Cannot split on forall condition"
+                        [@alert "-deprecated"]
                     })
               in
               let branch it nm =
@@ -2146,8 +2150,8 @@ let rec check_expr labels (e : BT.t Mu.expr) (k : IT.t -> unit m) : unit m =
            fail (fun _ ->
              { loc;
                msg =
-                 Generic (!^"undefined code label" ^/^ Sym.pp label_sym) [@alert
-                                                                           "-deprecated"]
+                 Generic (!^"undefined code label" ^/^ Sym.pp label_sym)
+                 [@alert "-deprecated"]
              })
          | Some (lt, lkind, _) -> return (lt, lkind)
        in
@@ -2216,9 +2220,9 @@ let post_state_of_rt loc rt =
 
 (* check_procedure: type check an (impure) procedure *)
 let check_procedure
-  (loc : Locations.t)
-  (fsym : Sym.t)
-  (args_and_body : _ Mu.args_and_body)
+      (loc : Locations.t)
+      (fsym : Sym.t)
+      (args_and_body : _ Mu.args_and_body)
   : unit m
   =
   debug 2 (lazy (headline ("checking procedure " ^ Sym.pp_string fsym)));
@@ -2240,27 +2244,27 @@ let check_procedure
      let@ () =
        ListM.iterM
          (fun (lsym, def) ->
-           pure
-             (match def with
-              | Mu.Return _loc -> return ()
-              | Label (loc, label_args_and_body, _annots, _, _loop_info) ->
-                debug
-                  2
-                  (lazy
-                    (headline
-                       ("checking label "
-                        ^ Sym.pp_string lsym
-                        ^ " "
-                        ^ Locations.to_string loc)));
-                let@ label_body, label_resources =
-                  bind_arguments loc label_args_and_body
-                in
-                let@ () = add_rs loc label_resources in
-                let _, label_kind, loc = Sym.Map.find lsym label_context in
-                let@ () =
-                  modify_where Where.(set_section (Label { loc; label = label_kind }))
-                in
-                check_expr_top loc label_context rt label_body))
+            pure
+              (match def with
+               | Mu.Return _loc -> return ()
+               | Label (loc, label_args_and_body, _annots, _, _loop_info) ->
+                 debug
+                   2
+                   (lazy
+                     (headline
+                        ("checking label "
+                         ^ Sym.pp_string lsym
+                         ^ " "
+                         ^ Locations.to_string loc)));
+                 let@ label_body, label_resources =
+                   bind_arguments loc label_args_and_body
+                 in
+                 let@ () = add_rs loc label_resources in
+                 let _, label_kind, loc = Sym.Map.find lsym label_context in
+                 let@ () =
+                   modify_where Where.(set_section (Label { loc; label = label_kind }))
+                 in
+                 check_expr_top loc label_context rt label_body))
          label_defs
      in
      return ())
@@ -2275,34 +2279,34 @@ let fail_fast = ref false
 let record_tagdefs tagDefs =
   PmapM.iterM
     (fun tag def ->
-      match def with
-      | Mu.UnionDef -> unsupported (Loc.other __LOC__) !^"todo: union types"
-      | StructDef layout -> Global.add_struct_decl tag layout)
+       match def with
+       | Mu.UnionDef -> unsupported (Loc.other __LOC__) !^"todo: union types"
+       | StructDef layout -> Global.add_struct_decl tag layout)
     tagDefs
 
 
 let check_tagdefs tagDefs =
   PmapM.iterM
     (fun _tag def ->
-      let open Memory in
-      match def with
-      | Mu.UnionDef -> unsupported (Loc.other __LOC__) !^"todo: union types"
-      | StructDef layout ->
-        let@ _ =
-          ListM.fold_rightM
-            (fun piece have ->
-              match piece.member_or_padding with
-              | Some (name, _) when IdSet.mem name have ->
-                (* this should have been checked earlier by the frontend *)
-                assert false
-              | Some (name, ct) ->
-                let@ () = WellTyped.check_ct (Loc.other __LOC__) ct in
-                return (IdSet.add name have)
-              | None -> return have)
-            layout
-            IdSet.empty
-        in
-        return ())
+       let open Memory in
+       match def with
+       | Mu.UnionDef -> unsupported (Loc.other __LOC__) !^"todo: union types"
+       | StructDef layout ->
+         let@ _ =
+           ListM.fold_rightM
+             (fun piece have ->
+                match piece.member_or_padding with
+                | Some (name, _) when IdSet.mem name have ->
+                  (* this should have been checked earlier by the frontend *)
+                  assert false
+                | Some (name, ct) ->
+                  let@ () = WellTyped.check_ct (Loc.other __LOC__) ct in
+                  return (IdSet.add name have)
+                | None -> return have)
+             layout
+             IdSet.empty
+         in
+         return ())
     tagDefs
 
 
@@ -2316,24 +2320,24 @@ let record_and_check_logical_functions funs =
   let@ () =
     ListM.iterM
       (fun (name, def) ->
-        let@ simple_def = WellTyped.function_ { def with body = Uninterp } in
-        Global.add_logical_function name simple_def)
+         let@ simple_def = WellTyped.function_ { def with body = Uninterp } in
+         Global.add_logical_function name simple_def)
       recursive
   in
   (* Now check all functions in order. *)
   let@ () =
     ListM.iteriM
       (fun i (name, def) ->
-        debug
-          2
-          (lazy
-            (headline
-               ("checking welltypedness of function"
-                ^ Pp.of_total i n_funs
-                ^ ": "
-                ^ Sym.pp_string name)));
-        let@ def = WellTyped.function_ def in
-        Global.add_logical_function name def)
+         debug
+           2
+           (lazy
+             (headline
+                ("checking welltypedness of function"
+                 ^ Pp.of_total i n_funs
+                 ^ ": "
+                 ^ Sym.pp_string name)));
+         let@ def = WellTyped.function_ def in
+         Global.add_logical_function name def)
       funs
   in
   let@ global = get_global () in
@@ -2349,24 +2353,24 @@ let record_and_check_resource_predicates preds =
   let@ () =
     ListM.iterM
       (fun (name, def) ->
-        let@ simple_def = WellTyped.predicate { def with clauses = None } in
-        Global.add_resource_predicate name simple_def)
+         let@ simple_def = WellTyped.predicate { def with clauses = None } in
+         Global.add_resource_predicate name simple_def)
       preds
   in
   let@ () =
     ListM.iteriM
       (fun i (name, def) ->
-        debug
-          2
-          (lazy
-            (headline
-               ("checking welltypedness of resource pred"
-                ^ Pp.of_total i (List.length preds)
-                ^ ": "
-                ^ Sym.pp_string name)));
-        let@ def = WellTyped.predicate def in
-        (* add simplified def to the context *)
-        Global.add_resource_predicate name def)
+         debug
+           2
+           (lazy
+             (headline
+                ("checking welltypedness of resource pred"
+                 ^ Pp.of_total i (List.length preds)
+                 ^ ": "
+                 ^ Sym.pp_string name)));
+         let@ def = WellTyped.predicate def in
+         (* add simplified def to the context *)
+         Global.add_resource_predicate name def)
       preds
   in
   let@ global = get_global () in
@@ -2381,36 +2385,36 @@ let record_globals : 'bty. (Sym.t * 'bty Mu.globs) list -> LC.t list m =
   fun globs ->
   ListM.fold_leftM
     (fun acc (sym, def) ->
-      match def with
-      | Mu.GlobalDef (ct, _) | GlobalDecl ct ->
-        let@ () = WellTyped.check_ct (Loc.other __LOC__) ct in
-        let bt = BT.(Loc ()) in
-        let info = (Loc.other __LOC__, lazy (Pp.item "global" (Sym.pp sym))) in
-        let@ () = add_a sym bt info in
-        let here = Locations.other __LOC__ in
-        let good = LC.T (IT.good_pointer ~pointee_ct:ct (sym_ (sym, bt, here)) here) in
-        let ptr = sym_ (sym, bt, here) in
-        let hasAllocId = LC.T (IT.hasAllocId_ ptr here) in
-        let range =
-          if !IT.use_vip then
-            let module H = Alloc.History in
-            let H.{ base; size } = H.(split (lookup_ptr ptr here) here) in
-            let addr = addr_ ptr here in
-            let upper = IT.upper_bound addr ct here in
-            let bounds =
-              and_
-                [ le_ (base, addr) here;
-                  le_ (addr, upper) here;
-                  le_ (upper, add_ (base, size) here) here
-                ]
-                here
-            in
-            [ LC.T bounds ]
-          else
-            []
-        in
-        (* TODO: check the expressions *)
-        return (good :: hasAllocId :: (range @ acc)))
+       match def with
+       | Mu.GlobalDef (ct, _) | GlobalDecl ct ->
+         let@ () = WellTyped.check_ct (Loc.other __LOC__) ct in
+         let bt = BT.(Loc ()) in
+         let info = (Loc.other __LOC__, lazy (Pp.item "global" (Sym.pp sym))) in
+         let@ () = add_a sym bt info in
+         let here = Locations.other __LOC__ in
+         let good = LC.T (IT.good_pointer ~pointee_ct:ct (sym_ (sym, bt, here)) here) in
+         let ptr = sym_ (sym, bt, here) in
+         let hasAllocId = LC.T (IT.hasAllocId_ ptr here) in
+         let range =
+           if !IT.use_vip then
+             let module H = Alloc.History in
+             let H.{ base; size } = H.(split (lookup_ptr ptr here) here) in
+             let addr = addr_ ptr here in
+             let upper = IT.upper_bound addr ct here in
+             let bounds =
+               and_
+                 [ le_ (base, addr) here;
+                   le_ (addr, upper) here;
+                   le_ (upper, add_ (base, size) here) here
+                 ]
+                 here
+             in
+             [ LC.T bounds ]
+           else
+             []
+         in
+         (* TODO: check the expressions *)
+         return (good :: hasAllocId :: (range @ acc)))
     []
     globs
 
@@ -2426,9 +2430,9 @@ let register_fun_syms file =
   in
   PmapM.iterM
     (fun fsym def ->
-      match def with
-      | Mu.Proc { loc; _ } -> add fsym loc
-      | ProcDecl (loc, _) -> add fsym loc)
+       match def with
+       | Mu.Proc { loc; _ } -> add fsym loc
+       | ProcDecl (loc, _) -> add fsym loc)
     file.Mu.funs
 
 
@@ -2446,28 +2450,28 @@ let wf_check_and_record_functions funs call_sigs =
   in
   PmapM.foldiM
     (fun i fsym def (trusted, checked) ->
-      match def with
-      | Mu.Proc { loc; args_and_body; trusted = tr; _ } ->
-        welltyped_ping i fsym;
-        let@ args_and_body = WellTyped.procedure loc args_and_body in
-        let ft = WellTyped.to_argument_type args_and_body in
-        debug 6 (lazy (!^"function type" ^^^ Sym.pp fsym));
-        debug 6 (lazy (CF.Pp_ast.pp_doc_tree (AT.dtree RT.dtree ft)));
-        let@ () = Global.add_fun_decl fsym (loc, Some ft, Pmap.find fsym call_sigs) in
-        (match tr with
-         | Trusted _ -> return ((fsym, (loc, ft)) :: trusted, checked)
-         | Checked -> return (trusted, (fsym, (loc, args_and_body)) :: checked))
-      | ProcDecl (loc, oft) ->
-        welltyped_ping i fsym;
-        let@ oft =
-          match oft with
-          | None -> return None
-          | Some ft ->
-            let@ ft = WellTyped.function_type "function" loc ft in
-            return (Some ft)
-        in
-        let@ () = Global.add_fun_decl fsym (loc, oft, Pmap.find fsym call_sigs) in
-        return (trusted, checked))
+       match def with
+       | Mu.Proc { loc; args_and_body; trusted = tr; _ } ->
+         welltyped_ping i fsym;
+         let@ args_and_body = WellTyped.procedure loc args_and_body in
+         let ft = WellTyped.to_argument_type args_and_body in
+         debug 6 (lazy (!^"function type" ^^^ Sym.pp fsym));
+         debug 6 (lazy (CF.Pp_ast.pp_doc_tree (AT.dtree RT.dtree ft)));
+         let@ () = Global.add_fun_decl fsym (loc, Some ft, Pmap.find fsym call_sigs) in
+         (match tr with
+          | Trusted _ -> return ((fsym, (loc, ft)) :: trusted, checked)
+          | Checked -> return (trusted, (fsym, (loc, args_and_body)) :: checked))
+       | ProcDecl (loc, oft) ->
+         welltyped_ping i fsym;
+         let@ oft =
+           match oft with
+           | None -> return None
+           | Some ft ->
+             let@ ft = WellTyped.function_type "function" loc ft in
+             return (Some ft)
+         in
+         let@ () = Global.add_fun_decl fsym (loc, oft, Pmap.find fsym call_sigs) in
+         return (trusted, checked))
     funs
     ([], [])
 
@@ -2712,7 +2716,7 @@ let record_and_check_datatypes datatypes =
   let@ () =
     ListM.iterM
       (fun (s, Mu.{ loc = _; cases = _ }) ->
-        Global.add_datatype s { constrs = []; all_params = [] })
+         Global.add_datatype s { constrs = []; all_params = [] })
       datatypes
   in
   (* check and normalise datatypes *)
@@ -2722,14 +2726,14 @@ let record_and_check_datatypes datatypes =
   (* properly add datatypes *)
   ListM.iterM
     (fun (s, Mu.{ loc = _; cases }) ->
-      let@ () =
-        Global.add_datatype
-          s
-          { constrs = List.map fst cases; all_params = List.concat_map snd cases }
-      in
-      ListM.iterM
-        (fun (c, params) -> Global.add_datatype_constr c { params; datatype_tag = s })
-        cases)
+       let@ () =
+         Global.add_datatype
+           s
+           { constrs = List.map fst cases; all_params = List.concat_map snd cases }
+       in
+       ListM.iterM
+         (fun (c, params) -> Global.add_datatype_constr c { params; datatype_tag = s })
+         cases)
     datatypes
 
 
@@ -2774,21 +2778,21 @@ let time_check_c_functions (global_var_constraints, (checked : c_function list))
   let@ () =
     Sym.Map.fold
       (fun _ def acc ->
-        (* I think this avoids a left-recursion in the monad bind *)
-        let@ () = Consistent.predicate def in
-        acc)
+         (* I think this avoids a left-recursion in the monad bind *)
+         let@ () = Consistent.predicate def in
+         acc)
       global.resource_predicates
       (return ())
   in
   let@ () =
     Sym.Map.fold
       (fun _ (loc, def, _) acc ->
-        match def with
-        | None -> acc
-        | Some def ->
-          (* I think this avoids a left-recursion in the monad bind *)
-          let@ () = Consistent.function_type "proc/fun" loc def in
-          acc)
+         match def with
+         | None -> acc
+         | Some def ->
+           (* I think this avoids a left-recursion in the monad bind *)
+           let@ () = Consistent.function_type "proc/fun" loc def in
+           acc)
       global.fun_decls
       (return ())
   in
@@ -2809,9 +2813,9 @@ let generate_lemmas lemmata o_lemma_mode =
     let@ () =
       Sym.Map.fold
         (fun sym (loc, lemma_typ) acc ->
-          (* I think this avoids a left-recursion in the monad bind *)
-          let@ () = Consistent.lemma loc sym lemma_typ in
-          acc)
+           (* I think this avoids a left-recursion in the monad bind *)
+           let@ () = Consistent.lemma loc sym lemma_typ in
+           acc)
         global.lemmata
         (return ())
     in

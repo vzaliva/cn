@@ -103,9 +103,9 @@ let member_number layout member =
 let member_offset (layout : struct_layout) member : int option =
   List.find_map
     (fun sp ->
-      match sp.member_or_padding with
-      | Some (member', _) when Id.equal member member' -> Some sp.offset
-      | _ -> None)
+       match sp.member_or_padding with
+       | Some (member', _) when Id.equal member member' -> Some sp.offset
+       | _ -> None)
     layout
 
 

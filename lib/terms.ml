@@ -291,7 +291,7 @@ let pp
       ^^ flow_map
            (comma ^^ hardline)
            (fun (member, it) ->
-             group @@ (group @@ dot ^^ Id.pp member ^^^ equals) ^^^ align (aux 0 it))
+              group @@ (group @@ dot ^^ Id.pp member ^^^ equals) ^^^ align (aux 0 it))
            members
       ^^^ rbrace
     | StructMember (t, member) -> wrap_after 15 (aux 15 t ^^ dot ^^ Id.pp member)
@@ -303,7 +303,7 @@ let pp
       ^^^ flow_map
             (break 0 ^^ comma ^^ space)
             (fun (member, it) ->
-              group @@ (group @@ dot ^^ Id.pp member ^^^ equals) ^^^ align (aux 0 it))
+               group @@ (group @@ dot ^^ Id.pp member ^^^ equals) ^^^ align (aux 0 it))
             members
       ^^^ rbrace
     | RecordMember (t, member) -> wrap_after 15 (aux 15 t ^^ dot ^^ Id.pp member)
@@ -347,7 +347,7 @@ let pp
                 @@ separate_map
                      (break 0)
                      (fun (pattern, body) ->
-                       pp_pattern pattern ^^^ !^"=>" ^^^ braces (aux 0 body))
+                        pp_pattern pattern ^^^ !^"=>" ^^^ braces (aux 0 body))
                      cases))
     | Constructor (s, args) ->
       Sym.pp s
@@ -371,7 +371,7 @@ let rec dtree_of_pat (Pat (pat_, _bt, _)) =
         Dleaf (Sym.pp s)
         :: List.map
              (fun (id, pat) ->
-               Dnode (pp_ctor "Arg", [ Dleaf (Id.pp id); dtree_of_pat pat ]))
+                Dnode (pp_ctor "Arg", [ Dleaf (Id.pp id); dtree_of_pat pat ]))
              pats )
 
 
@@ -413,7 +413,7 @@ let rec dtree (IT (it_, bt, loc)) =
         ( pp_ctor ("Struct(" ^ Sym.pp_string tag ^ ")"),
           List.map
             (fun (member, e) ->
-              Dnode (pp_ctor "Member", [ Dleaf (Id.pp member); dtree e ]))
+               Dnode (pp_ctor "Member", [ Dleaf (Id.pp member); dtree e ]))
             members )
     | StructMember (e, member) ->
       Dnode (pp_ctor "StructMember", [ dtree e; Dleaf (Id.pp member) ])
@@ -424,7 +424,7 @@ let rec dtree (IT (it_, bt, loc)) =
         ( pp_ctor "Record",
           List.map
             (fun (member, e) ->
-              Dnode (pp_ctor "Member", [ Dleaf (Id.pp member); dtree e ]))
+               Dnode (pp_ctor "Member", [ Dleaf (Id.pp member); dtree e ]))
             members )
     | RecordMember (e, member) ->
       Dnode (pp_ctor "RecordMember", [ dtree e; Dleaf (Id.pp member) ])
@@ -459,7 +459,7 @@ let rec dtree (IT (it_, bt, loc)) =
           dtree t
           :: List.map
                (fun (pat, body) ->
-                 Dnode (pp_ctor "Case", [ dtree_of_pat pat; dtree body ]))
+                  Dnode (pp_ctor "Case", [ dtree_of_pat pat; dtree body ]))
                pats )
     | Nil bt -> Dleaf (!^"Nil" ^^ Pp.angles (BaseTypes.pp bt))
     | Cons (t1, t2) -> Dnode (pp_ctor "Cons", [ dtree t1; dtree t2 ])

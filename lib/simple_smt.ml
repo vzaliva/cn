@@ -832,7 +832,7 @@ let new_solver (cfg : solver_config) : solver =
     specialized for evaluting in the context of a model *)
 type model_evaluator =
   { eval : (string * (string * sexp) list * sexp * sexp) list -> sexp -> sexp;
-    (** First define some local variables, then evaluate the expression *)
+      (** First define some local variables, then evaluate the expression *)
     stop : unit -> unit;
     force_stop : unit -> unit
   }

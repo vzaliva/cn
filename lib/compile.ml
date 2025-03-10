@@ -274,8 +274,8 @@ let convert_enum_expr =
           fail
             { loc;
               msg =
-                Generic (Pp.item "no standard encoding type for constant" (Pp.z z)) [@alert
-                                                                                      "-deprecated"]
+                Generic (Pp.item "no standard encoding type for constant" (Pp.z z))
+                [@alert "-deprecated"]
             }
       in
       return (IT.Surface.inj (IT.num_lit_ z bt loc))
@@ -286,7 +286,8 @@ let convert_enum_expr =
             Generic
               (Pp.item
                  "enum conversion: unhandled constant"
-                 (CF.Pp_ail_ast.pp_constant c)) [@alert "-deprecated"]
+                 (CF.Pp_ail_ast.pp_constant c))
+            [@alert "-deprecated"]
         }
   in
   let rec conv_expr_ e1 loc = function
@@ -300,8 +301,8 @@ let convert_enum_expr =
               (Pp.item
                  "enum conversion: unhandled expression kind"
                  (CF.Pp_ast.doc_tree_toplevel
-                    (CF.Pp_ail_ast.dtree_of_expression (fun _ -> !^"()") e1))) [@alert
-                                                                                 "-deprecated"]
+                    (CF.Pp_ail_ast.dtree_of_expression (fun _ -> !^"()") e1)))
+            [@alert "-deprecated"]
         }
   and conv_expr e =
     match e with AnnotatedExpression (_, _, loc, expr) -> conv_expr_ e loc expr
@@ -351,8 +352,8 @@ let add_datatype_info env (dt : cn_datatype) =
             Generic
               (!^"Re-using member name"
                ^^^ Id.pp nm
-               ^^^ !^"within datatype definition (SMT limitation).") [@alert
-                                                                       "-deprecated"]
+               ^^^ !^"within datatype definition (SMT limitation).")
+            [@alert "-deprecated"]
         }
   in
   let@ all_params =
@@ -598,17 +599,17 @@ module EffectfulTranslation = struct
       let@ env', locally_bound', args =
         ListM.fold_leftM
           (fun (env, locally_bound, acc) (m, pat') ->
-            match List.assoc_opt Id.equal m cons_info.params with
-            | None ->
-              fail
-                { loc;
-                  msg = Global (Unexpected_member (List.map fst cons_info.params, m))
-                }
-            | Some mbt ->
-              let@ env', locally_bound', pat' =
-                translate_cn_pat env locally_bound (pat', SBT.inj mbt)
-              in
-              return (env', locally_bound', acc @ [ (m, pat') ]))
+             match List.assoc_opt Id.equal m cons_info.params with
+             | None ->
+               fail
+                 { loc;
+                   msg = Global (Unexpected_member (List.map fst cons_info.params, m))
+                 }
+             | Some mbt ->
+               let@ env', locally_bound', pat' =
+                 translate_cn_pat env locally_bound (pat', SBT.inj mbt)
+               in
+               return (env', locally_bound', acc @ [ (m, pat') ]))
           (env, locally_bound, [])
           args
       in
@@ -626,8 +627,8 @@ module EffectfulTranslation = struct
         { loc;
           msg =
             (let open Pp in
-             (Generic (!^"quantified v must be integer or bitvector:" ^^^ SBT.pp bt) [@alert
-                                                                                       "-deprecated"]))
+             (Generic (!^"quantified v must be integer or bitvector:" ^^^ SBT.pp bt)
+             [@alert "-deprecated"]))
         }
 
 
@@ -635,10 +636,10 @@ module EffectfulTranslation = struct
     let open IndexTerms in
     let module BT = BaseTypes in
     let rec trans
-      (evaluation_scope : string option)
-      locally_bound
-      env
-      (CNExpr (loc, expr_))
+              (evaluation_scope : string option)
+              locally_bound
+              env
+              (CNExpr (loc, expr_))
       =
       let self = trans evaluation_scope locally_bound env in
       match expr_ with
@@ -708,11 +709,11 @@ module EffectfulTranslation = struct
            let@ expr =
              ListM.fold_rightM
                (fun (id, v) expr ->
-                 let@ v = self v in
-                 let start_pos = Option.get @@ Locations.start_pos @@ Id.get_loc id in
-                 let cursor = Cerb_location.PointCursor start_pos in
-                 let loc = Locations.region (start_pos, end_pos) cursor in
-                 return (IT (StructUpdate ((expr, id), v), bt, loc)))
+                  let@ v = self v in
+                  let start_pos = Option.get @@ Locations.start_pos @@ Id.get_loc id in
+                  let cursor = Cerb_location.PointCursor start_pos in
+                  let loc = Locations.region (start_pos, end_pos) cursor in
+                  return (IT (StructUpdate ((expr, id), v), bt, loc)))
                updates
                e
            in
@@ -743,19 +744,19 @@ module EffectfulTranslation = struct
         let@ (IT (e, bt, loc)) =
           ListM.fold_leftM
             (fun acc (i, v) ->
-              let@ i = self i in
-              let@ v = self v in
-              let end_pos = Option.get @@ Locations.end_pos @@ IT.get_loc v in
-              (* cursor for the first update doesn't point to '[' - oh well *)
-              let cursor =
-                Cerb_location.PointCursor
-                  (Option.get @@ Locations.start_pos @@ IT.get_loc i)
-              in
-              return
-                (IT
-                   ( MapSet (acc, i, v),
-                     bt,
-                     Cerb_location.region (start_pos, end_pos) cursor )))
+               let@ i = self i in
+               let@ v = self v in
+               let end_pos = Option.get @@ Locations.end_pos @@ IT.get_loc v in
+               (* cursor for the first update doesn't point to '[' - oh well *)
+               let cursor =
+                 Cerb_location.PointCursor
+                   (Option.get @@ Locations.start_pos @@ IT.get_loc i)
+               in
+               return
+                 (IT
+                    ( MapSet (acc, i, v),
+                      bt,
+                      Cerb_location.region (start_pos, end_pos) cursor )))
             e
             updates
         in
@@ -790,7 +791,8 @@ module EffectfulTranslation = struct
                 msg =
                   Generic
                     !^"type of array not specified (e.g. array_shift<int>) or known from \
-                       pointer" [@alert "-deprecated"]
+                       pointer"
+                  [@alert "-deprecated"]
               }
         in
         (match IT.get_bt base with
@@ -881,8 +883,8 @@ module EffectfulTranslation = struct
         let@ exprs =
           ListM.mapM
             (fun (nm, expr) ->
-              let@ expr = self expr in
-              return (nm, expr))
+               let@ expr = self expr in
+               return (nm, expr))
             exprs
         in
         return (IT (Constructor (c_nm, exprs), BT.Datatype cons_info.datatype_tag, loc))
@@ -905,11 +907,11 @@ module EffectfulTranslation = struct
         let@ ms =
           ListM.mapM
             (fun (pat, body) ->
-              let@ env', locally_bound', pat =
-                translate_cn_pat env locally_bound (pat, IT.get_bt x)
-              in
-              let@ body = trans evaluation_scope locally_bound' env' body in
-              return (pat, body))
+               let@ env', locally_bound', pat =
+                 translate_cn_pat env locally_bound (pat, IT.get_bt x)
+               in
+               let@ body = trans evaluation_scope locally_bound' env' body in
+               return (pat, body))
             ms
         in
         let rbt = IT.get_bt (snd (List.hd ms)) in
@@ -975,8 +977,8 @@ module EffectfulTranslation = struct
             fail
               { loc;
                 msg =
-                  Generic !^("Unknown evaluation scope '" ^ scope ^ "'.") [@alert
-                                                                            "-deprecated"]
+                  Generic !^("Unknown evaluation scope '" ^ scope ^ "'.")
+                  [@alert "-deprecated"]
               }
         in
         trans (Some scope) locally_bound env e
@@ -1073,7 +1075,8 @@ module EffectfulTranslation = struct
                       ^^^ !^cname
                       ^^^ !^" with an annotation: \'"
                       ^^^ !^cname
-                      ^^^ !^"<CTYPE>'.") [@alert "-deprecated"]
+                      ^^^ !^"<CTYPE>'.")
+                   [@alert "-deprecated"]
                }
            | has ->
              let expected = "pointer" in
@@ -1253,14 +1256,14 @@ let translate_cn_function env (def : cn_function) =
   let@ () =
     ListM.iterM
       (fun id ->
-        if List.exists (String.equal (Id.get_string id)) known_attrs then
-          return ()
-        else
-          fail
-            { loc = def.cn_func_loc;
-              msg =
-                Generic (Pp.item "Unknown attribute" (Id.pp id)) [@alert "-deprecated"]
-            })
+         if List.exists (String.equal (Id.get_string id)) known_attrs then
+           return ()
+         else
+           fail
+             { loc = def.cn_func_loc;
+               msg =
+                 Generic (Pp.item "Unknown attribute" (Id.pp id)) [@alert "-deprecated"]
+             })
       def.cn_func_attrs
   in
   let@ body =
@@ -1617,10 +1620,10 @@ module UsingLoads = struct
 end
 
 let translate_cn_statement
-  (allocations : Sym.t -> CF.Ctype.ctype)
-  old_states
-  env
-  (CN_statement (loc, stmt_))
+      (allocations : Sym.t -> CF.Ctype.ctype)
+      old_states
+      env
+      (CN_statement (loc, stmt_))
   =
   let open Cnprog in
   UsingLoads.handle

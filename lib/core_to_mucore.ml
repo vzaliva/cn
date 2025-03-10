@@ -134,8 +134,12 @@ let function_ids =
 
 
 let ity_act loc ity =
-  Mu.{ loc; annot = []; (* type_annot = (); *)
-                        ct = Sctypes.Integer ity }
+  Mu.
+    { loc;
+      annot = [];
+      (* type_annot = (); *)
+      ct = Sctypes.Integer ity
+    }
 
 
 let rec n_pexpr ~inherit_loc loc (Pexpr (annots, bty, pe)) : unit Mucore.pexpr =
@@ -354,7 +358,10 @@ let rec n_pexpr ~inherit_loc loc (Pexpr (annots, bty, pe)) : unit Mucore.pexpr =
           let op = CF.Core.IOpShr in
           let bound = Mu.Bound_Except act in
           let shift = annotate (PEbounded_binop (bound, op, arg1, arg2)) in
-          let impl_ok = true (* XXX: parameterize *) in
+          let impl_ok =
+            true
+            (* XXX: parameterize *)
+          in
           if impl_ok then
             shift
           else
@@ -643,11 +650,11 @@ let n_memop ~inherit_loc loc memop pexprs =
 let unsupported loc doc = fail { loc; msg = Unsupported (!^"unsupported" ^^^ doc) }
 
 let rec n_expr
-  ~inherit_loc
-  (loc : Locations.t)
-  ((env, old_states), desugaring_things)
-  (global_types, visible_objects_env)
-  e
+          ~inherit_loc
+          (loc : Locations.t)
+          ((env, old_states), desugaring_things)
+          (global_types, visible_objects_env)
+          e
   : unit Mucore.expr Or_TypeError.t
   =
   let markers_env, cn_desugaring_state = desugaring_things in
@@ -749,7 +756,8 @@ let rec n_expr
             CF.Impl_mem.case_ptrval
               ptrval
               (fun _ct -> err ())
-              (function None -> (* FIXME(CHERI merge) *) err () | Some sym -> return sym)
+              (function
+                | None -> (* FIXME(CHERI merge) *) err () | Some sym -> return sym)
               (fun _prov _ -> err ())
           | _ -> err ()
         in
@@ -794,35 +802,35 @@ let rec n_expr
            let@ desugared_stmts_and_stmts =
              ListM.mapM
                (fun parsed_stmt ->
-                 let@ desugared_stmt =
-                   do_ail_desugar_rdonly
-                     CAE.
-                       { markers_env;
-                         inner =
-                           { (Pmap.find marker_id markers_env) with
-                             cn_state = cn_desugaring_state
-                           }
-                       }
-                     (Desugar.cn_statement parsed_stmt)
-                 in
-                 let visible_objects =
-                   global_types @ Pmap.find marker_id_object_types visible_objects_env
-                 in
-                 (* debug 6 (lazy (!^"CN statement before translation")); debug 6 (lazy
+                  let@ desugared_stmt =
+                    do_ail_desugar_rdonly
+                      CAE.
+                        { markers_env;
+                          inner =
+                            { (Pmap.find marker_id markers_env) with
+                              cn_state = cn_desugaring_state
+                            }
+                        }
+                      (Desugar.cn_statement parsed_stmt)
+                  in
+                  let visible_objects =
+                    global_types @ Pmap.find marker_id_object_types visible_objects_env
+                  in
+                  (* debug 6 (lazy (!^"CN statement before translation")); debug 6 (lazy
                     (pp_doc_tree (CF.Cn_ocaml.PpAil.dtree_of_cn_statement
                     desugared_stmt))); *)
-                 let get_c_obj sym =
-                   match List.assoc_opt Sym.equal sym visible_objects with
-                   | Some obj_ty -> obj_ty
-                   | None ->
-                     failwith ("use of C obj without known type: " ^ Sym.pp_string sym)
-                 in
-                 let@ stmt =
-                   Compile.translate_cn_statement get_c_obj old_states env desugared_stmt
-                 in
-                 (* debug 6 (lazy (!^"CN statement after translation")); debug 6 (lazy
+                  let get_c_obj sym =
+                    match List.assoc_opt Sym.equal sym visible_objects with
+                    | Some obj_ty -> obj_ty
+                    | None ->
+                      failwith ("use of C obj without known type: " ^ Sym.pp_string sym)
+                  in
+                  let@ stmt =
+                    Compile.translate_cn_statement get_c_obj old_states env desugared_stmt
+                  in
+                  (* debug 6 (lazy (!^"CN statement after translation")); debug 6 (lazy
                     (pp_doc_tree (Cnprog.dtree stmt))); *)
-                 return (desugared_stmt, stmt))
+                  return (desugared_stmt, stmt))
                parsed_stmts
            in
            let desugared_stmts, stmts = List.split desugared_stmts_and_stmts in
@@ -962,7 +970,15 @@ let make_label_args f_i loc env st args (accesses, inv) =
           [ alloc_res; owned_res ])
       in
       let@ at =
-        aux (resources @ resources', good_lcs @ (* good_pointer_lc :: *) lcs) env st rest
+        aux
+          ( resources @ resources',
+            good_lcs
+            @
+            (* good_pointer_lc :: *)
+            lcs )
+          env
+          st
+          rest
       in
       return (Mu.mComputational ((s, Loc ()), (loc, None)) at)
     | [] ->
@@ -1019,7 +1035,8 @@ let make_fun_with_spec_args f_i loc env args (accesses, requires) =
                    ^^^ BT.pp bt
                    ^^^ parens (!^"from" ^^^ Sctypes.pp ct)
                    ^^^ !^"and"
-                   ^^^ BT.pp (SBT.proj sbt2)) [@alert "-deprecated"]
+                   ^^^ BT.pp (SBT.proj sbt2))
+                [@alert "-deprecated"]
             }
       in
       let env = C.add_computational pure_arg sbt env in
@@ -1046,8 +1063,8 @@ let desugar_access d_st global_types (loc, id) =
       fail
         { loc;
           msg =
-            Generic !^"accesses: expected global, not enum constant" [@alert
-                                                                       "-deprecated"]
+            Generic !^"accesses: expected global, not enum constant"
+            [@alert "-deprecated"]
         }
     | Var_kind_cn ->
       let msg =
@@ -1090,8 +1107,8 @@ let desugar_conds d_st conds =
   let@ conds, d_st =
     ListM.fold_leftM
       (fun (conds, d_st) cond ->
-        let@ cond, d_st = desugar_cond d_st cond in
-        return (cond :: conds, d_st))
+         let@ cond, d_st = desugar_cond d_st cond in
+         return (cond :: conds, d_st))
       ([], d_st)
       conds
   in
@@ -1131,21 +1148,21 @@ let dtree_of_accesses accesses =
     ( pp_ctor "AccessesAnnotation",
       List.map
         (fun (_loc, (s, ct)) ->
-          Dnode
-            (pp_ctor "Access", [ Dleaf (Sym.pp s); Dleaf (CF.Pp_core_ctype.pp_ctype ct) ]))
+           Dnode
+             (pp_ctor "Access", [ Dleaf (Sym.pp s); Dleaf (CF.Pp_core_ctype.pp_ctype ct) ]))
         accesses )
 
 
 let normalise_label
-  ~inherit_loc
-  fsym
-  (markers_env, precondition_cn_desugaring_state)
-  (global_types, visible_objects_env)
-  (accesses, (loop_attributes : CF.Annot.loop_attributes))
-  (env : C.env)
-  st
-  _label_name
-  label
+      ~inherit_loc
+      fsym
+      (markers_env, precondition_cn_desugaring_state)
+      (global_types, visible_objects_env)
+      (accesses, (loop_attributes : CF.Annot.loop_attributes))
+      (env : C.env)
+      st
+      _label_name
+      label
   =
   match label with
   | CF.Milicore.Mi_Return loc -> return (Mu.Return loc)
@@ -1176,12 +1193,12 @@ let normalise_label
        let@ label_args_and_body =
          make_label_args
            (fun env st ->
-             n_expr
-               ~inherit_loc
-               loc
-               ((env, st.old_states), (markers_env, cn_desugaring_state))
-               (global_types, visible_objects_env)
-               label_body)
+              n_expr
+                ~inherit_loc
+                loc
+                ((env, st.old_states), (markers_env, cn_desugaring_state))
+                (global_types, visible_objects_env)
+                label_body)
            loc
            env
            st
@@ -1236,7 +1253,7 @@ module Spec = struct
 
   let combine ?if_spec parsed : _ parsed t =
     let process
-      Cn.{ cn_func_trusted; cn_func_acc_func; cn_func_requires; cn_func_ensures }
+          Cn.{ cn_func_trusted; cn_func_acc_func; cn_func_requires; cn_func_ensures }
       : _ parsed
       =
       let cross_fst x =
@@ -1330,11 +1347,11 @@ module Spec = struct
   let add_spec_arg_renames loc args arg_cts cn_spec_args env =
     List.fold_right
       (fun ((fun_sym, _), (ct, (spec_sym, _))) env ->
-        C.add_renamed_computational
-          spec_sym
-          fun_sym
-          (Memory.sbt_of_sct (convert_ct loc ct))
-          env)
+         C.add_renamed_computational
+           spec_sym
+           fun_sym
+           (Memory.sbt_of_sct (convert_ct loc ct))
+           env)
       (List.combine args (List.combine arg_cts cn_spec_args))
       env
 
@@ -1351,9 +1368,9 @@ module Spec = struct
   let logical_fun_syms d_st mk_functions =
     ListM.mapM
       (fun (loc, id) ->
-        (* from Thomas's convert_c_logical_funs *)
-        let@ logical_fun_sym = do_ail_desugar_rdonly d_st (CAE.lookup_cn_function id) in
-        return (loc, logical_fun_sym))
+         (* from Thomas's convert_c_logical_funs *)
+         let@ logical_fun_sym = do_ail_desugar_rdonly d_st (CAE.lookup_cn_function id) in
+         return (loc, logical_fun_sym))
       mk_functions
 
 
@@ -1366,9 +1383,9 @@ module Spec = struct
     }
 
   let desugar
-    global_types
-    d_st
-    ({ trusted; accesses; requires; ensures; functions; if_spec = _ } : _ parsed)
+        global_types
+        d_st
+        ({ trusted; accesses; requires; ensures; functions; if_spec = _ } : _ parsed)
     : (desugared * _ * _) t
     =
     let@ functions = logical_fun_syms d_st functions in
@@ -1383,15 +1400,15 @@ module Spec = struct
 end
 
 let normalise_fun_map_decl
-  ~inherit_loc
-  (markers_env, ail_prog)
-  (global_types, visible_objects_env)
-  env
-  fun_specs
-  (funinfo : CF.Milicore.mi_funinfo)
-  loop_attributes
-  fname
-  decl
+      ~inherit_loc
+      (markers_env, ail_prog)
+      (global_types, visible_objects_env)
+      env
+      fun_specs
+      (funinfo : CF.Milicore.mi_funinfo)
+      loop_attributes
+      fname
+      decl
   =
   match Pmap.lookup fname funinfo with
   | None -> return None
@@ -1432,37 +1449,37 @@ let normalise_fun_map_decl
        let@ args_and_body =
          make_function_args
            (fun arg_states env st ->
-             let st = C.LocalState.make_state_old st C.start_evaluation_scope in
-             let@ body =
-               n_expr
-                 ~inherit_loc
-                 loc
-                 ((env, st.old_states), (markers_env, d_st.inner.cn_state))
-                 (global_types, visible_objects_env)
-                 body
-             in
-             let@ returned =
-               C.make_rt
-                 loc
-                 env
-                 (C.LocalState.add_c_variable_states arg_states st)
-                 (ret_s, ret_ct)
-                 (accesses, ensures)
-             in
-             let@ labels =
-               PmapM.mapM
-                 (normalise_label
-                    ~inherit_loc
-                    fname
-                    (markers_env, CAE.(d_st.inner.cn_state))
-                    (global_types, visible_objects_env)
-                    (accesses, loop_attributes)
-                    env
-                    st)
-                 labels
-                 Sym.compare
-             in
-             return (body, labels, returned))
+              let st = C.LocalState.make_state_old st C.start_evaluation_scope in
+              let@ body =
+                n_expr
+                  ~inherit_loc
+                  loc
+                  ((env, st.old_states), (markers_env, d_st.inner.cn_state))
+                  (global_types, visible_objects_env)
+                  body
+              in
+              let@ returned =
+                C.make_rt
+                  loc
+                  env
+                  (C.LocalState.add_c_variable_states arg_states st)
+                  (ret_s, ret_ct)
+                  (accesses, ensures)
+              in
+              let@ labels =
+                PmapM.mapM
+                  (normalise_label
+                     ~inherit_loc
+                     fname
+                     (markers_env, CAE.(d_st.inner.cn_state))
+                     (global_types, visible_objects_env)
+                     (accesses, loop_attributes)
+                     env
+                     st)
+                  labels
+                  Sym.compare
+              in
+              return (body, labels, returned))
            loc
            env
            (List.combine (List.combine ail_args arg_cts) args)
@@ -1486,10 +1503,10 @@ let normalise_fun_map_decl
           let@ args_and_rt =
             make_fun_with_spec_args
               (fun env st ->
-                let@ returned =
-                  C.make_rt loc env st (ret_s, ret_ct) (accesses, ensures)
-                in
-                return returned)
+                 let@ returned =
+                   C.make_rt loc env st (ret_s, ret_ct) (accesses, ensures)
+                 in
+                 return returned)
               loc
               env
               (List.combine spec_args (List.map snd arg_cts))
@@ -1504,42 +1521,42 @@ let normalise_fun_map_decl
 (* BuiltinDecl(loc, convert_bt loc bt, List.map (convert_bt loc) bts) *)
 
 let normalise_fun_map
-  ~inherit_loc
-  (markers_env, ail_prog)
-  (global_types, visible_objects_env)
-  env
-  fun_specs
-  funinfo
-  loop_attributes
-  fmap
+      ~inherit_loc
+      (markers_env, ail_prog)
+      (global_types, visible_objects_env)
+      env
+      fun_specs
+      funinfo
+      loop_attributes
+      fmap
   =
   let@ fmap, mk_functions, failed =
     PmapM.foldM
       (fun fsym fdecl (fmap, mk_functions, failed) ->
-        try
-          let@ r =
-            normalise_fun_map_decl
-              ~inherit_loc
-              (markers_env, ail_prog)
-              (global_types, visible_objects_env)
-              env
-              fun_specs
-              funinfo
-              loop_attributes
-              fsym
-              fdecl
-          in
-          match r with
-          | Some (fdecl, more_mk_functions) ->
-            let mk_functions' =
-              List.map
-                (fun (loc, lsym) -> Mu.{ c_fun_sym = fsym; loc; l_fun_sym = lsym })
-                more_mk_functions
-            in
-            return (Pmap.add fsym fdecl fmap, mk_functions' @ mk_functions, failed)
-          | None -> return (fmap, mk_functions, failed)
-        with
-        | ConversionFailed -> return (fmap, mk_functions, true))
+         try
+           let@ r =
+             normalise_fun_map_decl
+               ~inherit_loc
+               (markers_env, ail_prog)
+               (global_types, visible_objects_env)
+               env
+               fun_specs
+               funinfo
+               loop_attributes
+               fsym
+               fdecl
+           in
+           match r with
+           | Some (fdecl, more_mk_functions) ->
+             let mk_functions' =
+               List.map
+                 (fun (loc, lsym) -> Mu.{ c_fun_sym = fsym; loc; l_fun_sym = lsym })
+                 more_mk_functions
+             in
+             return (Pmap.add fsym fdecl fmap, mk_functions' @ mk_functions, failed)
+           | None -> return (fmap, mk_functions, failed)
+         with
+         | ConversionFailed -> return (fmap, mk_functions, true))
       fmap
       (Pmap.empty Sym.compare, [], false)
   in
@@ -1574,8 +1591,8 @@ let normalise_globs ~inherit_loc env _sym g =
 let normalise_globs_list ~inherit_loc env gs =
   ListM.mapM
     (fun (sym, g) ->
-      let@ g = normalise_globs ~inherit_loc env sym g in
-      return (sym, g))
+       let@ g = normalise_globs ~inherit_loc env sym g in
+       return (sym, g))
     gs
 
 
@@ -1628,9 +1645,9 @@ let normalise_tag_definition tag (loc, def) =
 let normalise_tag_definitions tagDefs =
   Pmap.fold
     (fun tag def acc ->
-      let@ acc in
-      let@ normed = normalise_tag_definition tag def in
-      return (Pmap.add tag normed acc))
+       let@ acc in
+       let@ normed = normalise_tag_definition tag def in
+       return (Pmap.add tag normed acc))
     tagDefs
     (return (Pmap.empty Sym.compare))
 
@@ -1667,9 +1684,9 @@ let normalise_file ~inherit_loc ((fin_markers_env : CAE.fin_markers_env), ail_pr
   let global_types =
     List.map
       (fun (s, global) ->
-        match global with
-        | GlobalDef ((_bt, ct), _e) -> (s, ct)
-        | GlobalDecl (_bt, ct) -> (s, ct))
+         match global with
+         | GlobalDef ((_bt, ct), _e) -> (s, ct)
+         | GlobalDecl (_bt, ct) -> (s, ct))
       file.mi_globs
   in
   let@ globs = normalise_globs_list ~inherit_loc env file.mi_globs in
@@ -1702,12 +1719,12 @@ let normalise_file ~inherit_loc ((fin_markers_env : CAE.fin_markers_env), ail_pr
   let call_funinfo =
     Pmap.mapi
       (fun _fsym (_, _, ret, args, variadic, has_proto) ->
-        Sctypes.
-          { sig_return_ty = ret;
-            sig_arg_tys = List.map snd args;
-            sig_variadic = variadic;
-            sig_has_proto = has_proto
-          })
+         Sctypes.
+           { sig_return_ty = ret;
+             sig_arg_tys = List.map snd args;
+             sig_variadic = variadic;
+             sig_has_proto = has_proto
+           })
       file.mi_funinfo
   in
   let stdlib_syms = Sym.Set.of_list (List.map fst (Pmap.bindings_list file.mi_stdlib)) in

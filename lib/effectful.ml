@@ -24,16 +24,16 @@ module Make (T : S) = struct
     let mapfstM (f : 'a -> 'c t) (l : ('a * 'b) list) : ('c * 'b) list t =
       mapM
         (fun (a, b) ->
-          let@ c = f a in
-          return (c, b))
+           let@ c = f a in
+           return (c, b))
         l
 
 
     let mapsndM (f : 'b -> 'c t) (l : ('a * 'b) list) : ('a * 'c) list t =
       mapM
         (fun (a, b) ->
-          let@ c = f b in
-          return (a, c))
+           let@ c = f b in
+           return (a, c))
         l
 
 
@@ -75,8 +75,8 @@ module Make (T : S) = struct
       let@ ys =
         mapM
           (fun x ->
-            let@ b = f x in
-            return (b, x))
+             let@ b = f x in
+             return (b, x))
           xs
       in
       return (List.map snd (List.filter fst ys))
@@ -85,8 +85,8 @@ module Make (T : S) = struct
     let fold_leftM (f : 'a -> 'b -> 'c t) (a : 'a) (bs : 'b list) =
       List.fold_left
         (fun aM b ->
-          let@ a = aM in
-          f a b)
+           let@ a = aM in
+           f a b)
         (return a)
         bs
 
@@ -94,8 +94,8 @@ module Make (T : S) = struct
     let fold_rightM (f : 'b -> 'a -> 'c t) (bs : 'b list) (a : 'a) =
       List.fold_right
         (fun b aM ->
-          let@ a = aM in
-          f b a)
+           let@ a = aM in
+           f b a)
         bs
         (return a)
   end
@@ -104,8 +104,8 @@ module Make (T : S) = struct
     let foldM (f : 'k -> 'x -> 'y -> 'y t) (map : ('k, 'x) Pmap.map) (init : 'y) : 'y t =
       Pmap.fold
         (fun k v aM ->
-          let@ a = aM in
-          f k v a)
+           let@ a = aM in
+           f k v a)
         map
         (return init)
 
@@ -122,8 +122,8 @@ module Make (T : S) = struct
     let iterM f m =
       Pmap.fold
         (fun k v m ->
-          let@ () = m in
-          f k v)
+           let@ () = m in
+           f k v)
         m
         (return ())
 
@@ -133,8 +133,8 @@ module Make (T : S) = struct
       =
       foldM
         (fun k v m ->
-          let@ v' = f k v in
-          return (Pmap.add k v' m))
+           let@ v' = f k v in
+           return (Pmap.add k v' m))
         m
         (Pmap.empty cmp)
   end

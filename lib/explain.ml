@@ -44,9 +44,9 @@ let relevant_predicate_clauses global name req =
     let defs = Sym.Map.bindings global.resource_predicates in
     List.concat_map
       (fun (nm, (def : Def.Predicate.t)) ->
-        match def.clauses with
-        | Some clauses -> List.map (fun c -> (nm, c)) clauses
-        | None -> [])
+         match def.clauses with
+         | Some clauses -> List.map (fun c -> (nm, c)) clauses
+         | None -> [])
       defs
   in
   List.filter (fun (nm, c) -> Sym.equal nm name || clause_has_resource req c) clauses
@@ -71,13 +71,13 @@ let subterms_without_bound_variables bindings =
   IT.fold_subterms
     ~bindings
     (fun bindings acc t ->
-      let pats = List.map fst bindings in
-      let bound = List.concat_map IT.bound_by_pattern pats in
-      let bound = Sym.Set.of_list (List.map fst bound) in
-      if Sym.Set.(is_empty (inter bound (IT.free_vars t))) then
-        ITSet.add t acc
-      else
-        acc)
+       let pats = List.map fst bindings in
+       let bound = List.concat_map IT.bound_by_pattern pats in
+       let bound = Sym.Set.of_list (List.map fst bound) in
+       if Sym.Set.(is_empty (inter bound (IT.free_vars t))) then
+         ITSet.add t acc
+       else
+         acc)
     ITSet.empty
 
 
@@ -169,11 +169,11 @@ let state (ctxt : C.t) log model_with_q extras =
   let interesting, uninteresting =
     List.partition
       (fun lc ->
-        match lc with
-        (* | LC.T (IT (Aligned _, _, _)) -> false *)
-        | LC.T (IT (Representable _, _, _)) -> false
-        | LC.T (IT (Good _, _, _)) -> false
-        | _ -> true)
+         match lc with
+         (* | LC.T (IT (Aligned _, _, _)) -> false *)
+         | LC.T (IT (Representable _, _, _)) -> false
+         | LC.T (IT (Good _, _, _)) -> false
+         | _ -> true)
       (LC.Set.elements ctxt.constraints)
   in
   let not_given_to_solver =
@@ -258,10 +258,10 @@ let state (ctxt : C.t) log model_with_q extras =
     let filtered =
       List.filter_map
         (fun it ->
-          match evaluate it with
-          | Some value when not (IT.equal value it) -> Some (it, value)
-          | Some _ -> None
-          | None -> None)
+           match evaluate it with
+           | Some value when not (IT.equal value it) -> Some (it, value)
+           | Some _ -> None
+           | None -> None)
         (ITSet.elements subterms)
     in
     let pretty_printed =
@@ -272,7 +272,7 @@ let state (ctxt : C.t) log model_with_q extras =
     let interesting, uninteresting =
       List.partition
         (fun (it, _entry) ->
-          match IT.get_bt it with BT.Unit -> false | BT.Loc () -> false | _ -> true)
+           match IT.get_bt it with BT.Unit -> false | BT.Loc () -> false | _ -> true)
         pretty_printed
     in
     ( Rp.add_labeled
@@ -302,9 +302,9 @@ let state (ctxt : C.t) log model_with_q extras =
     let interesting_diff_res, uninteresting_diff_res =
       List.partition
         (fun (ret, _o) ->
-          match ret with
-          | Req.P ret when Req.equal_name ret.name Req.Predicate.alloc -> false
-          | _ -> true)
+           match ret with
+           | Req.P ret when Req.equal_name ret.name Req.Predicate.alloc -> false
+           | _ -> true)
         diff_res
     in
     let with_suff mb x = match mb with None -> x | Some d -> d ^^^ x in

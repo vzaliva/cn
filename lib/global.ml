@@ -149,15 +149,15 @@ let pp_struct_layout (tag, layout) =
     (separate_map
        hardline
        (fun Memory.{ offset; size; member_or_padding } ->
-         item "offset" (Pp.int offset)
-         ^^ comma
-         ^^^ item "size" (Pp.int size)
-         ^^ comma
-         ^^^ item
-               "content"
-               (match member_or_padding with
-                | Some (member, sct) -> typ (Id.pp member) (Sctypes.pp sct)
-                | None -> parens (!^"padding" ^^^ Pp.int size)))
+          item "offset" (Pp.int offset)
+          ^^ comma
+          ^^^ item "size" (Pp.int size)
+          ^^ comma
+          ^^^ item
+                "content"
+                (match member_or_padding with
+                 | Some (member, sct) -> typ (Id.pp member) (Sctypes.pp sct)
+                 | None -> parens (!^"padding" ^^^ Pp.int size)))
        layout)
 
 

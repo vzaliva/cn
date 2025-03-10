@@ -337,7 +337,10 @@ let progress_simple title name =
 let of_total cur total = Printf.sprintf "[%d/%d]" cur total
 
 let document_to_yojson (doc : document) : Yojson.Safe.t =
-  let buf_size = 1024 (* chosen pretty arbitrarily *) in
+  let buf_size =
+    1024
+    (* chosen pretty arbitrarily *)
+  in
   let buf = Stdlib.Buffer.create buf_size in
   PPrint.ToBuffer.compact buf doc;
   let str = Stdlib.Buffer.contents buf in

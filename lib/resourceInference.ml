@@ -4,10 +4,10 @@ module Req = Request
 open Typing
 
 let debug_constraint_failure_diagnostics
-  lvl
-  (model_with_q : Solver.model_with_q)
-  simp_ctxt
-  c
+      lvl
+      (model_with_q : Solver.model_with_q)
+      simp_ctxt
+      c
   =
   let model = fst model_with_q in
   if !Pp.print_level == 0 then
@@ -88,13 +88,13 @@ module General = struct
   (* this version is parametric in resource_request (defined below) to ensure the
      return-type (also parametric) is as general as possible *)
   let parametric_ftyp_args_request_step
-    resource_request
-    rt_subst
-    loc
-    (uiinfo : uiinfo)
-    _original_resources
-    ftyp
-    changed_or_deleted
+        resource_request
+        rt_subst
+        loc
+        (uiinfo : uiinfo)
+        _original_resources
+        ftyp
+        changed_or_deleted
     =
     (* take one step of the "spine" judgement, reducing a function-type by claiming an
        argument resource or otherwise reducing towards an instantiated return-type *)
@@ -269,56 +269,57 @@ module General = struct
       map_and_fold_resources
         loc
         (fun re (needed, oarg) ->
-          let continue = (Unchanged, (needed, oarg)) in
-          assert (Req.steps_constant (fst re));
-          if IT.is_false needed then
-            continue
-          else (
-            match re with
-            | Q p', O p'_oarg
-              when Req.subsumed requested.name p'.name
-                   && IT.equal step p'.step
-                   && BaseTypes.equal (snd requested.q) (snd p'.q) ->
-              let p' = Req.QPredicate.alpha_rename_ (fst requested.q) p' in
-              let here = Locations.other __LOC__ in
-              let pmatch =
-                (* Work-around for https://github.com/Z3Prover/z3/issues/7352 *)
-                Simplify.IndexTerms.simp simp_ctxt
-                @@ IT.eq_ (requested.pointer, p'.pointer) here
-              in
-              let iarg_match =
-                let eq_here x y = IT.eq_ (x, y) here in
-                IT.and_ (List.map2 eq_here requested.iargs p'.iargs) here
-              in
-              let took =
-                IT.and_ [ iarg_match; requested.permission; p'.permission ] here
-              in
-              (match provable (LC.Forall (requested.q, IT.not_ took here)) with
-               | `True -> continue
-               | `False ->
-                 (match provable (LC.T pmatch) with
-                  | `True ->
-                    Pp.debug 9 (lazy (Pp.item "used resource" (Req.pp (fst re))));
-                    let open IT in
-                    let needed' =
-                      [ needed; not_ (and_ [ iarg_match; p'.permission ] here) here ]
-                    in
-                    let permission' =
-                      [ p'.permission; not_ (and_ [ iarg_match; needed ] here) here ]
-                    in
-                    let oarg =
-                      add_case (Many { many_guard = took; value = p'_oarg }) oarg
-                    in
-                    ( Changed (Q { p' with permission = and_ permission' here }, O p'_oarg),
-                      (Simplify.IndexTerms.simp simp_ctxt (and_ needed' here), oarg) )
-                  | `False ->
-                    let model = Solver.model () in
-                    Pp.debug
-                      9
-                      (lazy (Pp.item "couldn't use q-resource" (Req.pp (fst re))));
-                    debug_constraint_failure_diagnostics 9 model simp_ctxt (LC.T pmatch);
-                    continue))
-            | _re -> continue))
+           let continue = (Unchanged, (needed, oarg)) in
+           assert (Req.steps_constant (fst re));
+           if IT.is_false needed then
+             continue
+           else (
+             match re with
+             | Q p', O p'_oarg
+               when Req.subsumed requested.name p'.name
+                    && IT.equal step p'.step
+                    && BaseTypes.equal (snd requested.q) (snd p'.q) ->
+               let p' = Req.QPredicate.alpha_rename_ (fst requested.q) p' in
+               let here = Locations.other __LOC__ in
+               let pmatch =
+                 (* Work-around for https://github.com/Z3Prover/z3/issues/7352 *)
+                 Simplify.IndexTerms.simp simp_ctxt
+                 @@ IT.eq_ (requested.pointer, p'.pointer) here
+               in
+               let iarg_match =
+                 let eq_here x y = IT.eq_ (x, y) here in
+                 IT.and_ (List.map2 eq_here requested.iargs p'.iargs) here
+               in
+               let took =
+                 IT.and_ [ iarg_match; requested.permission; p'.permission ] here
+               in
+               (match provable (LC.Forall (requested.q, IT.not_ took here)) with
+                | `True -> continue
+                | `False ->
+                  (match provable (LC.T pmatch) with
+                   | `True ->
+                     Pp.debug 9 (lazy (Pp.item "used resource" (Req.pp (fst re))));
+                     let open IT in
+                     let needed' =
+                       [ needed; not_ (and_ [ iarg_match; p'.permission ] here) here ]
+                     in
+                     let permission' =
+                       [ p'.permission; not_ (and_ [ iarg_match; needed ] here) here ]
+                     in
+                     let oarg =
+                       add_case (Many { many_guard = took; value = p'_oarg }) oarg
+                     in
+                     ( Changed
+                         (Q { p' with permission = and_ permission' here }, O p'_oarg),
+                       (Simplify.IndexTerms.simp simp_ctxt (and_ needed' here), oarg) )
+                   | `False ->
+                     let model = Solver.model () in
+                     Pp.debug
+                       9
+                       (lazy (Pp.item "couldn't use q-resource" (Req.pp (fst re))));
+                     debug_constraint_failure_diagnostics 9 model simp_ctxt (LC.T pmatch);
+                     continue))
+             | _re -> continue))
         (needed, C [])
     in
     let here = Locations.other __LOC__ in
@@ -327,47 +328,47 @@ module General = struct
       let module Eff = Effectful.Make (Typing) in
       Eff.ListM.fold_rightM
         (fun (predicate_name, index) (needed, oarg) ->
-          let continue = return (needed, oarg) in
-          if
-            (not (IT.is_false needed))
-            && Req.subsumed requested.name predicate_name
-            && BaseTypes.equal (snd requested.q) (IT.get_bt index)
-          then (
-            let su = IT.make_subst [ (fst requested.q, index) ] in
-            let needed_at_index = IT.subst su needed in
-            match provable (LC.T needed_at_index) with
-            | `False -> continue
-            | `True ->
-              let@ o_re_index =
-                let pointer =
-                  IT.(
-                    pointer_offset_
-                      ( requested.pointer,
-                        mul_
-                          ( cast_ Memory.uintptr_bt requested.step here,
-                            cast_ Memory.uintptr_bt index here )
-                          here ))
-                    here
-                in
-                predicate_request
-                  loc
-                  uiinfo
-                  { name = requested.name;
-                    pointer;
-                    iargs = List.map (IT.subst su) requested.iargs
-                  }
-              in
-              (match o_re_index with
-               | None -> continue
-               | Some ((_p', O p'_oarg), _) ->
-                 let oarg = add_case (One { one_index = index; value = p'_oarg }) oarg in
-                 let sym, bt' = requested.q in
-                 let needed' =
-                   IT.(and_ [ needed; ne__ (sym_ (sym, bt', here)) index here ] here)
+           let continue = return (needed, oarg) in
+           if
+             (not (IT.is_false needed))
+             && Req.subsumed requested.name predicate_name
+             && BaseTypes.equal (snd requested.q) (IT.get_bt index)
+           then (
+             let su = IT.make_subst [ (fst requested.q, index) ] in
+             let needed_at_index = IT.subst su needed in
+             match provable (LC.T needed_at_index) with
+             | `False -> continue
+             | `True ->
+               let@ o_re_index =
+                 let pointer =
+                   IT.(
+                     pointer_offset_
+                       ( requested.pointer,
+                         mul_
+                           ( cast_ Memory.uintptr_bt requested.step here,
+                             cast_ Memory.uintptr_bt index here )
+                           here ))
+                     here
                  in
-                 return (needed', oarg)))
-          else
-            continue)
+                 predicate_request
+                   loc
+                   uiinfo
+                   { name = requested.name;
+                     pointer;
+                     iargs = List.map (IT.subst su) requested.iargs
+                   }
+               in
+               (match o_re_index with
+                | None -> continue
+                | Some ((_p', O p'_oarg), _) ->
+                  let oarg = add_case (One { one_index = index; value = p'_oarg }) oarg in
+                  let sym, bt' = requested.q in
+                  let needed' =
+                    IT.(and_ [ needed; ne__ (sym_ (sym, bt', here)) index here ] here)
+                  in
+                  return (needed', oarg)))
+           else
+             continue)
         movable_indices
         (needed, oarg)
     in

@@ -56,10 +56,10 @@ let is_empty_ail_stmt = function
 
 
 let generate_sym_with_suffix
-  ?(suffix = "_tag")
-  ?(uppercase = false)
-  ?(lowercase = false)
-  constructor
+      ?(suffix = "_tag")
+      ?(uppercase = false)
+      ?(lowercase = false)
+      constructor
   =
   let str = Sym.pp_string constructor ^ suffix in
   let str = if uppercase then String.uppercase_ascii str else str in

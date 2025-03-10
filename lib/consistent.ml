@@ -117,10 +117,10 @@ let function_type =
 
 
 let logicalArguments
-  (i_welltyped : Loc.t -> 'i -> 'j Typing.t)
-  kind
-  loc
-  (at : 'i Mucore.arguments_l)
+      (i_welltyped : Loc.t -> 'i -> 'j Typing.t)
+      kind
+      loc
+      (at : 'i Mucore.arguments_l)
   : unit Typing.t
   =
   let rec aux =
@@ -154,7 +154,10 @@ let logicalArguments
 
 
 let arguments
-  :  (Loc.t -> 'i -> 'j Typing.t) -> string -> Loc.t -> 'i Mucore.arguments ->
+  : (Loc.t -> 'i -> 'j Typing.t) ->
+  string ->
+  Loc.t ->
+  'i Mucore.arguments ->
   unit Typing.t
   =
   fun (i_welltyped : Loc.t -> 'i -> 'j Typing.t) kind loc (at : 'i Mucore.arguments) ->
@@ -180,20 +183,20 @@ let procedure : Loc.t -> _ Mucore.args_and_body -> unit Typing.t =
   fun (loc : Loc.t) (at : 'TY1 Mucore.args_and_body) ->
   arguments
     (fun loc (_body, labels, rt) ->
-      let@ () = pure_and_no_initial_resources loc (returnTypes loc rt) in
-      PmapM.iterM
-        (fun _sym def ->
-          match def with
-          | Mucore.Return _ -> return ()
-          | Label (loc, label_args_and_body, _annots, _parsed_spec, _loop_info) ->
-            pure_and_no_initial_resources
-              loc
-              (arguments
-                 (fun _loc _label_body -> return ())
-                 "label"
-                 loc
-                 label_args_and_body))
-        labels)
+       let@ () = pure_and_no_initial_resources loc (returnTypes loc rt) in
+       PmapM.iterM
+         (fun _sym def ->
+            match def with
+            | Mucore.Return _ -> return ()
+            | Label (loc, label_args_and_body, _annots, _parsed_spec, _loop_info) ->
+              pure_and_no_initial_resources
+                loc
+                (arguments
+                   (fun _loc _label_body -> return ())
+                   "label"
+                   loc
+                   label_args_and_body))
+         labels)
     "function"
     loc
     at
@@ -214,22 +217,22 @@ let predicate pred =
        let@ _ =
          ListM.fold_leftM
            (fun acc Def.Clause.{ loc; guard; packing_ft } ->
-             let here = Locations.other __LOC__ in
-             let negated_guards =
-               List.map (fun clause -> IT.not_ clause.Def.Clause.guard here) acc
-             in
-             pure
-               (let@ () = add_c loc (LC.T guard) in
-                let@ () = add_c loc (LC.T (IT.and_ negated_guards here)) in
-                let@ () =
-                  logicalArgumentTypes
-                    (fun _loc _it -> return ())
-                    IT.pp
-                    "clause"
-                    loc
-                    packing_ft
-                in
-                return (acc @ [ Def.Clause.{ loc; guard; packing_ft } ])))
+              let here = Locations.other __LOC__ in
+              let negated_guards =
+                List.map (fun clause -> IT.not_ clause.Def.Clause.guard here) acc
+              in
+              pure
+                (let@ () = add_c loc (LC.T guard) in
+                 let@ () = add_c loc (LC.T (IT.and_ negated_guards here)) in
+                 let@ () =
+                   logicalArgumentTypes
+                     (fun _loc _it -> return ())
+                     IT.pp
+                     "clause"
+                     loc
+                     packing_ft
+                 in
+                 return (acc @ [ Def.Clause.{ loc; guard; packing_ft } ])))
            []
            clauses
        in

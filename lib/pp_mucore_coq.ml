@@ -30,10 +30,10 @@ let pp_list pp_elem xs =
   !^"["
   ^^^ List.fold_left
         (fun acc x ->
-          if acc == P.empty then
-            pp_elem x
-          else
-            acc ^^ !^";" ^^^ pp_elem x)
+           if acc == P.empty then
+             pp_elem x
+           else
+             acc ^^ !^";" ^^^ pp_elem x)
         P.empty
         xs
   ^^^ !^"]"
@@ -54,10 +54,10 @@ let pp_pair p1 p2 (a, b) = pp_tuple [ p1 a; p2 b ]
 let pp_triple p1 p2 p3 (a, b, c) = pp_tuple [ p1 a; p2 b; p3 c ]
 
 let pp_pmap
-  fromlist_fun
-  (pp_key : 'a -> P.document)
-  (pp_value : 'b -> P.document)
-  (m : ('a, 'b) Pmap.map)
+      fromlist_fun
+      (pp_key : 'a -> P.document)
+      (pp_value : 'b -> P.document)
+      (m : ('a, 'b) Pmap.map)
   =
   P.parens (!^fromlist_fun ^^^ pp_list (pp_pair pp_key pp_value) (Pmap.bindings_list m))
 
@@ -98,7 +98,7 @@ let pp_record fields =
            ^^ P.separate_map
                 (!^";" ^^ P.break 1)
                 (fun (name, value) ->
-                  P.group (!^(name ^ " :=") ^^ P.nest 2 (P.break 1 ^^ value)))
+                   P.group (!^(name ^ " :=") ^^ P.nest 2 (P.break 1 ^^ value)))
                 fields)
      ^^ P.break 1
      ^^ !^"|}")
@@ -1943,21 +1943,21 @@ let pp_file pp_type pp_type_name file =
   ^^ P.hardline
   ^^ List.fold_left
        (fun acc (sym, glob) ->
-         acc
-         ^^
-         match glob with
-         | GlobalDef (ct, e) ->
-           coq_def
-             (Pp_symbol.to_string sym)
-             P.empty
-             (pp_constructor1 "GlobalDef" [ pp_sctype ct; pp_expr pp_type e ])
-           ^^ P.hardline
-         | GlobalDecl ct ->
-           coq_def
-             (Pp_symbol.to_string sym)
-             P.empty
-             (pp_constructor1 "GlobalDecl" [ pp_sctype ct ])
-           ^^ P.hardline)
+          acc
+          ^^
+          match glob with
+          | GlobalDef (ct, e) ->
+            coq_def
+              (Pp_symbol.to_string sym)
+              P.empty
+              (pp_constructor1 "GlobalDef" [ pp_sctype ct; pp_expr pp_type e ])
+            ^^ P.hardline
+          | GlobalDecl ct ->
+            coq_def
+              (Pp_symbol.to_string sym)
+              P.empty
+              (pp_constructor1 "GlobalDecl" [ pp_sctype ct ])
+            ^^ P.hardline)
        P.empty
        file.globs
   (* Print functions *)
@@ -1965,31 +1965,31 @@ let pp_file pp_type pp_type_name file =
   ^^ P.hardline
   ^^ Pmap.fold
        (fun sym decl acc ->
-         acc
-         ^^
-         match decl with
-         | ProcDecl (loc, ft) ->
-           coq_def
-             (Pp_symbol.to_string_pretty_cn sym)
-             P.empty
-             (pp_constructor
-                "ProcDecl"
-                [ pp_type_name;
-                  pp_location loc;
-                  pp_option (pp_argument_types pp_return_type) ft
-                ])
-         | Proc { loc; args_and_body; trusted; desugared_spec } ->
-           coq_def
-             (Pp_symbol.to_string_pretty_cn sym)
-             P.empty
-             (pp_constructor
-                "Proc"
-                [ pp_type_name;
-                  pp_location loc;
-                  pp_args_and_body pp_type args_and_body;
-                  pp_trusted trusted;
-                  pp_desugared_spec desugared_spec
-                ]))
+          acc
+          ^^
+          match decl with
+          | ProcDecl (loc, ft) ->
+            coq_def
+              (Pp_symbol.to_string_pretty_cn sym)
+              P.empty
+              (pp_constructor
+                 "ProcDecl"
+                 [ pp_type_name;
+                   pp_location loc;
+                   pp_option (pp_argument_types pp_return_type) ft
+                 ])
+          | Proc { loc; args_and_body; trusted; desugared_spec } ->
+            coq_def
+              (Pp_symbol.to_string_pretty_cn sym)
+              P.empty
+              (pp_constructor
+                 "Proc"
+                 [ pp_type_name;
+                   pp_location loc;
+                   pp_args_and_body pp_type args_and_body;
+                   pp_trusted trusted;
+                   pp_desugared_spec desugared_spec
+                 ]))
        file.funs
        P.empty
 
@@ -2154,8 +2154,8 @@ let pp_global (g : Global.t) =
       ( "Global.fun_decls",
         pp_sym_map
           (fun (l, a, s) ->
-            pp_tuple
-              [ pp_location l; pp_option pp_argument_types_ft a; pp_c_concrete_sig s ])
+             pp_tuple
+               [ pp_location l; pp_option pp_argument_types_ft a; pp_c_concrete_sig s ])
           g.fun_decls );
       ( "Global.resource_predicates",
         pp_sym_map pp_definition_predicate g.resource_predicates );

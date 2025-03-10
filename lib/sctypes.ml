@@ -167,8 +167,8 @@ let rec of_ctype (Ctype.Ctype (_, ct_)) =
     let@ args =
       ListM.mapM
         (fun (_arg_q, arg_ct, is_reg) ->
-          let@ arg_ct = of_ctype arg_ct in
-          return (arg_ct, is_reg))
+           let@ arg_ct = of_ctype arg_ct in
+           return (arg_ct, is_reg))
         args
     in
     let@ ret_ct = of_ctype ret_ct in

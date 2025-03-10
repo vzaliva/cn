@@ -123,8 +123,8 @@ let add_records_to_map_from_instrumentation (i : Executable_spec_extract.instrum
     List.iter add_records_to_map_from_cnprogs stmts;
     List.iter
       (fun (_, _, _, loop_at) ->
-        let loop_stmts = aux_at loop_at in
-        List.iter add_records_to_map_from_cnprogs loop_stmts)
+         let loop_stmts = aux_at loop_at in
+         List.iter add_records_to_map_from_cnprogs loop_stmts)
       loops
 
 
@@ -162,19 +162,19 @@ let add_records_to_map_from_struct (tag_def : Mucore.tag_definition) =
   | Mucore.StructDef sl ->
     List.iter
       (fun (sp : Memory.struct_piece) ->
-        match sp.member_or_padding with
-        | Some (_, sct) ->
-          populate
-            (BT.of_sct Memory.is_signed_integer_type Memory.size_of_integer_type sct)
-        | None -> ())
+         match sp.member_or_padding with
+         | Some (_, sct) ->
+           populate
+             (BT.of_sct Memory.is_signed_integer_type Memory.size_of_integer_type sct)
+         | None -> ())
       sl
   | UnionDef -> ()
 
 
 (* Populate record table *)
 let populate_record_map
-  (instrumentation : Executable_spec_extract.instrumentation list)
-  (prog5 : unit Mucore.file)
+      (instrumentation : Executable_spec_extract.instrumentation list)
+      (prog5 : unit Mucore.file)
   =
   add_records_to_map_from_fns_and_preds prog5.logical_predicates prog5.resource_predicates;
   List.iter add_records_to_map_from_datatype (List.map snd prog5.datatypes);
@@ -231,7 +231,7 @@ let generate_c_record_funs (sigm : CF.GenTypes.genTypeCategory CF.AilSyntax.sigm
   let decl_docs =
     List.map
       (fun (sym, (_, _, decl)) ->
-        CF.Pp_ail.pp_function_prototype ~executable_spec:true sym decl)
+         CF.Pp_ail.pp_function_prototype ~executable_spec:true sym decl)
       (eq_decls @ default_decls @ mapget_decls)
   in
   let fun_prot_strs =

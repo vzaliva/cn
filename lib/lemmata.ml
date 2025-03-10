@@ -328,7 +328,7 @@ let monomorphise_dt_lists global =
   let all_dt_types =
     Sym.Map.fold
       (fun _ dt_info ss ->
-        List.filter_map dt_lists (List.map snd dt_info.Dt.all_params) @ ss)
+         List.filter_map dt_lists (List.map snd dt_info.Dt.all_params) @ ss)
       global.Global.datatypes
       []
   in
@@ -456,10 +456,10 @@ let tuple_syn xs =
 
 
 let find_tuple_element
-  (eq : 'a -> 'a -> bool)
-  (x : 'a)
-  (pp : 'a -> Pp.document)
-  (ys : 'a list)
+      (eq : 'a -> 'a -> bool)
+      (x : 'a)
+      (pp : 'a -> Pp.document)
+      (ys : 'a list)
   =
   let n_ys = List.mapi (fun i y -> (i, y)) ys in
   match List.find_opt (fun (_i, y) -> eq x y) n_ys with
@@ -612,15 +612,15 @@ and ensure_datatype (global : Global.t) (list_mono : list_mono) loc dt_tag =
        let@ dt_eqs =
          ListM.mapM
            (fun dt_tag ->
-             let info = Sym.Map.find dt_tag global.datatypes in
-             let@ c_lines = ListM.mapM (cons_line dt_tag) info.constrs in
-             return
-               (!^"    "
-                ^^ Sym.pp dt_tag
-                ^^^ colon
-                ^^^ !^"Type :="
-                ^^ hardline
-                ^^ flow hardline c_lines))
+              let info = Sym.Map.find dt_tag global.datatypes in
+              let@ c_lines = ListM.mapM (cons_line dt_tag) info.constrs in
+              return
+                (!^"    "
+                 ^^ Sym.pp dt_tag
+                 ^^^ colon
+                 ^^^ !^"Type :="
+                 ^^ hardline
+                 ^^ flow hardline c_lines))
            family
        in
        return
@@ -628,7 +628,7 @@ and ensure_datatype (global : Global.t) (list_mono : list_mono) loc dt_tag =
             hardline
             (List.mapi
                (fun i doc ->
-                 !^(if i = 0 then "  Inductive" else "    with") ^^ hardline ^^ doc)
+                  !^(if i = 0 then "  Inductive" else "    with") ^^ hardline ^^ doc)
                dt_eqs)
           ^^ !^"."
           ^^ hardline)))
@@ -646,10 +646,10 @@ let ensure_datatype_member global list_mono loc dt_tag (mem_tag : Id.t) bt =
     let pats =
       List.map
         (fun (m2, _) ->
-          if Id.equal mem_tag m2 then
-            Id.pp mem_tag
-          else
-            Pp.string "_")
+           if Id.equal mem_tag m2 then
+             Id.pp mem_tag
+           else
+             Pp.string "_")
         c_info.params
     in
     let open Pp in
@@ -691,10 +691,10 @@ let ensure_single_datatype_member global list_mono loc dt_tag (mem_tag : Id.t) b
     let pats =
       List.map
         (fun (m2, _) ->
-          if Id.equal mem_tag m2 then
-            Id.pp mem_tag
-          else
-            Pp.string "_")
+           if Id.equal mem_tag m2 then
+             Id.pp mem_tag
+           else
+             Pp.string "_")
         c_info.params
     in
     let open Pp in
@@ -812,8 +812,8 @@ let ensure_pred global list_mono loc name aux =
          let@ args =
            ListM.mapM
              (fun (sym, bt) ->
-               let@ coq_bt = bt_to_coq global list_mono inf bt in
-               return (Pp.parens (Pp.typ (Sym.pp sym) coq_bt)))
+                let@ coq_bt = bt_to_coq global list_mono inf bt in
+                return (Pp.parens (Pp.typ (Sym.pp sym) coq_bt)))
              def.args
          in
          return (defn (Sym.pp_string name) args None rhs)))
@@ -1368,9 +1368,9 @@ let generate (global : Global.t) directions (lemmata : (Sym.t * (Loc.t * AT.lemm
   in
   List.iter
     (fun x ->
-      Pp.progress_simple
-        "skipping trusted fun with resource"
-        (Sym.pp_string x.sym ^ ": " ^ Option.get x.scan_res.res))
+       Pp.progress_simple
+         "skipping trusted fun with resource"
+         (Sym.pp_string x.sym ^ ": " ^ Option.get x.scan_res.res))
     skip;
   (* let fun_info = List.fold_right (fun (s, def) m -> Sym.Map.add s def m) *)
   (*       mu_file.mu_logical_predicates Sym.Map.empty in *)

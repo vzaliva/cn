@@ -471,10 +471,10 @@ let pp_message = function
     let state =
       Option.map
         (fun (model, constr) ->
-          Explain.trace
-            ctxt
-            model
-            Explain.{ no_ex with unproven_constraint = Some (LC.T constr) })
+           Explain.trace
+             ctxt
+             model
+             Explain.{ no_ex with unproven_constraint = Some (LC.T constr) })
         model_constr
     in
     let descr = !^"Need an Alloc or RW in context with same allocation id" in
@@ -580,11 +580,11 @@ let mk_output_dir (output_dir : string option) : string =
     generated name will always include the user-provided [~name], which should
     be a valid filename. *)
 let located_file_name
-  ?(fn_name : string option)
-  ~(dir : string)
-  ~(name : string)
-  ~(ext : string)
-  (error_loc : Cerb_location.t)
+      ?(fn_name : string option)
+      ~(dir : string)
+      ~(name : string)
+      ~(ext : string)
+      (error_loc : Cerb_location.t)
   : string
   =
   let source_file_tag =
@@ -600,9 +600,9 @@ let located_file_name
 (** Construct a canonical filename for state output derived from the given error
     location, located in [output_dir]. *)
 let mk_state_file_name
-  ?(fn_name : string option)
-  (output_dir : string)
-  (loc : Cerb_location.t)
+      ?(fn_name : string option)
+      (output_dir : string)
+      (loc : Cerb_location.t)
   : string
   =
   located_file_name ?fn_name ~dir:output_dir ~name:"state" ~ext:".html" loc
@@ -611,9 +611,9 @@ let mk_state_file_name
 (** Construct a canonical filename for report output derived from the given
     error location, located in [output_dir]. *)
 let mk_report_file_name
-  ?(fn_name : string option)
-  (output_dir : string)
-  (loc : Cerb_location.t)
+      ?(fn_name : string option)
+      (output_dir : string)
+      (loc : Cerb_location.t)
   : string
   =
   located_file_name ?fn_name ~dir:output_dir ~name:"report" ~ext:".json" loc
@@ -624,10 +624,10 @@ let mk_report_file_name
     one in [output_dir] (or, failing that, the system temporary directory) and
     print a link to it. *)
 let report_pretty
-  ?(output_dir : string option)
-  ?(fn_name : string option)
-  ?(serialize_json : bool = false)
-  { loc; msg }
+      ?(output_dir : string option)
+      ?(fn_name : string option)
+      ?(serialize_json : bool = false)
+      { loc; msg }
   =
   (* stealing some logic from pp_errors *)
   let report = pp_message msg in
@@ -653,10 +653,10 @@ let report_pretty
 
 (* stealing some logic from pp_errors *)
 let report_json
-  ?(output_dir : string option)
-  ?(fn_name : string option)
-  ?(serialize_json : bool = false)
-  { loc; msg }
+      ?(output_dir : string option)
+      ?(fn_name : string option)
+      ?(serialize_json : bool = false)
+      { loc; msg }
   =
   let report = pp_message msg in
   let state_error_file, report_file =

@@ -130,8 +130,8 @@ let generate_c_local_ownership_entry_inj dest_is_loop loc decls bindings =
     let ownership_bs_and_ss =
       List.map
         (fun (sym, _) ->
-          let ctype = find_ctype_from_bindings bindings sym in
-          generate_c_local_ownership_entry_bs_and_ss (sym, ctype))
+           let ctype = find_ctype_from_bindings bindings sym in
+           generate_c_local_ownership_entry_bs_and_ss (sym, ctype))
         decls
     in
     let bs, ss = List.split ownership_bs_and_ss in
@@ -190,11 +190,11 @@ let rec take n = function
 
 
 let rec get_c_control_flow_block_unmaps_aux
-  break_vars
-  continue_vars
-  return_vars
-  bindings
-  A.(AnnotatedStatement (loc, _, s_))
+          break_vars
+          continue_vars
+          return_vars
+          bindings
+          A.(AnnotatedStatement (loc, _, s_))
   =
   match s_ with
   | A.(AilSdeclaration _) -> []
@@ -202,14 +202,14 @@ let rec get_c_control_flow_block_unmaps_aux
     let injs =
       List.mapi
         (fun i s ->
-          let ss_ = take (i + 1) ss in
-          let visibles = collect_visibles (bs @ bindings) ss_ in
-          get_c_control_flow_block_unmaps_aux
-            (visibles @ break_vars)
-            (visibles @ continue_vars)
-            (visibles @ return_vars)
-            (bs @ bindings)
-            s)
+           let ss_ = take (i + 1) ss in
+           let visibles = collect_visibles (bs @ bindings) ss_ in
+           get_c_control_flow_block_unmaps_aux
+             (visibles @ break_vars)
+             (visibles @ continue_vars)
+             (visibles @ return_vars)
+             (bs @ bindings)
+             s)
         ss
     in
     List.concat injs
@@ -272,8 +272,8 @@ let rec get_c_block_entry_exit_injs_aux bindings A.(AnnotatedStatement (loc, _, 
     let exit_injs =
       List.map
         (fun (b_sym, ((_, _, _), _, _, b_ctype)) ->
-          ( get_end_loc ~offset:(-1) loc,
-            [ generate_c_local_ownership_exit (b_sym, b_ctype) ] ))
+           ( get_end_loc ~offset:(-1) loc,
+             [ generate_c_local_ownership_exit (b_sym, b_ctype) ] ))
         bs
     in
     let exit_injs' = List.map (fun (loc, stats) -> (loc, [], stats)) exit_injs in
@@ -339,7 +339,7 @@ let rec remove_duplicates ds = function
 
 
 let get_c_block_local_ownership_checking_injs
-  A.(AnnotatedStatement (_, _, fn_block) as statement)
+      A.(AnnotatedStatement (_, _, fn_block) as statement)
   =
   match fn_block with
   | A.(AilSblock _) ->
@@ -351,12 +351,12 @@ let get_c_block_local_ownership_checking_injs
     let combined_injs =
       List.map
         (fun l ->
-          let injs' = combine_injs_over_location l injs in
-          let expr_opt_list, bs_list, stats_list =
-            Executable_spec_utils.list_split_three injs'
-          in
-          let return_expr_opt = get_return_expr_opt expr_opt_list in
-          (l, return_expr_opt, List.concat bs_list, List.concat stats_list))
+           let injs' = combine_injs_over_location l injs in
+           let expr_opt_list, bs_list, stats_list =
+             Executable_spec_utils.list_split_three injs'
+           in
+           let return_expr_opt = get_return_expr_opt expr_opt_list in
+           (l, return_expr_opt, List.concat bs_list, List.concat stats_list))
         locs
     in
     combined_injs
@@ -367,8 +367,8 @@ let get_c_block_local_ownership_checking_injs
 
 (* Ghost state *)
 let get_c_fn_local_ownership_checking_injs
-  sym
-  (sigm : CF.GenTypes.genTypeCategory CF.AilSyntax.sigma)
+      sym
+      (sigm : CF.GenTypes.genTypeCategory CF.AilSyntax.sigma)
   =
   match
     ( List.assoc_opt Sym.equal sym sigm.function_definitions,

@@ -503,9 +503,9 @@ let do_check_model loc m prop =
   let eqs =
     List.filter_map
       (fun v ->
-        match Solver.eval (fst m) v with
-        | None -> None
-        | Some x -> Some (IT.eq_ (v, x) here))
+         match Solver.eval (fst m) v with
+         | None -> None
+         | Some x -> Some (IT.eq_ (v, x) here))
       vs
   in
   let@ prover = provable_internal loc in
@@ -617,25 +617,25 @@ let map_and_fold_resources_internal loc (f : Res.t -> 'acc -> changed * 'acc) (a
   let resources, ix, hist, changed_or_deleted, acc =
     List.fold_right
       (fun (re, i) (resources, ix, hist, changed_or_deleted, acc) ->
-        let changed, acc = f re acc in
-        match changed with
-        | Deleted ->
-          let ix, hist = Context.res_written loc i "deleted" (ix, hist) in
-          (resources, ix, hist, i :: changed_or_deleted, acc)
-        | Unchanged -> ((re, i) :: resources, ix, hist, changed_or_deleted, acc)
-        | Changed re ->
-          let ix, hist = Context.res_written loc i "changed" (ix, hist) in
-          (match re with
-           | Q { q; permission; _ }, _ ->
-             let here = Locations.other __LOC__ in
-             (match provable_f (LC.forall_ q (IT.not_ permission here)) with
-              | `True -> (resources, ix, hist, i :: changed_or_deleted, acc)
-              | `False ->
-                let ix, hist = Context.res_written loc ix "changed" (ix, hist) in
-                ((re, ix) :: resources, ix + 1, hist, i :: changed_or_deleted, acc))
-           | _ ->
-             let ix, hist = Context.res_written loc ix "changed" (ix, hist) in
-             ((re, ix) :: resources, ix + 1, hist, i :: changed_or_deleted, acc)))
+         let changed, acc = f re acc in
+         match changed with
+         | Deleted ->
+           let ix, hist = Context.res_written loc i "deleted" (ix, hist) in
+           (resources, ix, hist, i :: changed_or_deleted, acc)
+         | Unchanged -> ((re, i) :: resources, ix, hist, changed_or_deleted, acc)
+         | Changed re ->
+           let ix, hist = Context.res_written loc i "changed" (ix, hist) in
+           (match re with
+            | Q { q; permission; _ }, _ ->
+              let here = Locations.other __LOC__ in
+              (match provable_f (LC.forall_ q (IT.not_ permission here)) with
+               | `True -> (resources, ix, hist, i :: changed_or_deleted, acc)
+               | `False ->
+                 let ix, hist = Context.res_written loc ix "changed" (ix, hist) in
+                 ((re, ix) :: resources, ix + 1, hist, i :: changed_or_deleted, acc))
+            | _ ->
+              let ix, hist = Context.res_written loc ix "changed" (ix, hist) in
+              ((re, ix) :: resources, ix + 1, hist, i :: changed_or_deleted, acc)))
       resources
       ([], orig_ix, orig_hist, [], acc)
   in
@@ -666,23 +666,23 @@ let do_unfold_resources loc =
       let keep, unpack, extract =
         List.fold_right
           (fun (re, i) (keep, unpack, extract) ->
-            match Pack.unpack loc s.global provable_f2 re with
-            | Some unpackable ->
-              let pname = Req.get_name (fst re) in
-              (keep, (i, pname, unpackable) :: unpack, extract)
-            | None ->
-              let re_reduced, extracted =
-                Pack.extractable_multiple provable_m movable_indices re
-              in
-              let keep' =
-                match extracted with
-                | [] -> (re_reduced, i) :: keep
-                | _ ->
-                  (match Pack.resource_empty provable_f2 re_reduced with
-                   | `Empty -> keep
-                   | `NonEmpty _ -> (re_reduced, i) :: keep)
-              in
-              (keep', unpack, extracted @ extract))
+             match Pack.unpack loc s.global provable_f2 re with
+             | Some unpackable ->
+               let pname = Req.get_name (fst re) in
+               (keep, (i, pname, unpackable) :: unpack, extract)
+             | None ->
+               let re_reduced, extracted =
+                 Pack.extractable_multiple provable_m movable_indices re
+               in
+               let keep' =
+                 match extracted with
+                 | [] -> (re_reduced, i) :: keep
+                 | _ ->
+                   (match Pack.resource_empty provable_f2 re_reduced with
+                    | `Empty -> keep
+                    | `NonEmpty _ -> (re_reduced, i) :: keep)
+               in
+               (keep', unpack, extracted @ extract))
           resources
           ([], [], [])
       in

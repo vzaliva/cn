@@ -87,9 +87,9 @@ let json_raw_loc loc : Yojson.Safe.t =
             ( "RegionCursor",
               Some
                 (`Assoc
-                  [ ("cursor_start", json_lexing_position b);
-                    ("cursor_end", json_lexing_position e)
-                  ]) )
+                    [ ("cursor_start", json_lexing_position b);
+                      ("cursor_end", json_lexing_position e)
+                    ]) )
       in
       let args =
         [ ("region_start", startp'); ("region_end", endp'); ("region_cursor", cursor') ]
@@ -99,9 +99,9 @@ let json_raw_loc loc : Yojson.Safe.t =
       let starts_ends' =
         List.map
           (fun (startp, endp) ->
-            let startp' = json_lexing_position startp in
-            let endp' = json_lexing_position endp in
-            `Assoc [ ("regions_start", startp'); ("regions_end", endp') ])
+             let startp' = json_lexing_position startp in
+             let endp' = json_lexing_position endp in
+             `Assoc [ ("regions_start", startp'); ("regions_end", endp') ])
           starts_ends
       in
       let cursor' =
@@ -113,9 +113,9 @@ let json_raw_loc loc : Yojson.Safe.t =
             ( "RegionCursor",
               Some
                 (`Assoc
-                  [ ("cursor_start", json_lexing_position b);
-                    ("cursor_end", json_lexing_position e)
-                  ]) )
+                    [ ("cursor_start", json_lexing_position b);
+                      ("cursor_end", json_lexing_position e)
+                    ]) )
       in
       let args = [ ("regions", `List starts_ends'); ("cursor", cursor') ] in
       `Variant ("Region", Some (`Assoc args))

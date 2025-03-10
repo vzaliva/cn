@@ -52,35 +52,37 @@ let packing_ft loc global provable ret =
        let lrt, value =
          List.fold_right
            (fun { offset; size; member_or_padding } (lrt, value) ->
-             match member_or_padding with
-             | Some (member, mct) ->
-               let request =
-                 P
-                   { name = Owned (mct, init);
-                     pointer = IT.memberShift_ (ret.pointer, tag, member) loc;
-                     iargs = []
-                   }
-               in
-               let m_value_s, m_value =
-                 IT.fresh_named (Memory.bt_of_sct mct) (Id.get_string member) loc
-               in
-               ( LRT.Resource ((m_value_s, (request, IT.get_bt m_value)), (loc, None), lrt),
-                 (member, m_value) :: value )
-             | None ->
-               let padding_ct = Sctypes.Array (Sctypes.char_ct, Some size) in
-               let request =
-                 P
-                   { name = Owned (padding_ct, Uninit);
-                     pointer =
-                       IT.pointer_offset_ (ret.pointer, IT.uintptr_int_ offset loc) loc;
-                     iargs = []
-                   }
-               in
-               let padding_s, padding =
-                 IT.fresh_named (Memory.bt_of_sct padding_ct) "padding" loc
-               in
-               ( LRT.Resource ((padding_s, (request, IT.get_bt padding)), (loc, None), lrt),
-                 value ))
+              match member_or_padding with
+              | Some (member, mct) ->
+                let request =
+                  P
+                    { name = Owned (mct, init);
+                      pointer = IT.memberShift_ (ret.pointer, tag, member) loc;
+                      iargs = []
+                    }
+                in
+                let m_value_s, m_value =
+                  IT.fresh_named (Memory.bt_of_sct mct) (Id.get_string member) loc
+                in
+                ( LRT.Resource
+                    ((m_value_s, (request, IT.get_bt m_value)), (loc, None), lrt),
+                  (member, m_value) :: value )
+              | None ->
+                let padding_ct = Sctypes.Array (Sctypes.char_ct, Some size) in
+                let request =
+                  P
+                    { name = Owned (padding_ct, Uninit);
+                      pointer =
+                        IT.pointer_offset_ (ret.pointer, IT.uintptr_int_ offset loc) loc;
+                      iargs = []
+                    }
+                in
+                let padding_s, padding =
+                  IT.fresh_named (Memory.bt_of_sct padding_ct) "padding" loc
+                in
+                ( LRT.Resource
+                    ((padding_s, (request, IT.get_bt padding)), (loc, None), lrt),
+                  value ))
            layout
            (LRT.I, [])
        in
@@ -104,28 +106,29 @@ let unpack_owned loc global (ct, init) pointer (O o) =
     let res =
       List.fold_right
         (fun { offset; size; member_or_padding } res ->
-          match member_or_padding with
-          | Some (member, mct) ->
-            let mresource =
-              ( P
-                  { name = Owned (mct, init);
-                    pointer = IT.memberShift_ (pointer, tag, member) loc;
-                    iargs = []
-                  },
-                O (IT.member_ ~member_bt:(Memory.bt_of_sct mct) (o, member) loc) )
-            in
-            mresource :: res
-          | None ->
-            let padding_ct = Sctypes.Array (Sctypes.char_ct, Some size) in
-            let mresource =
-              ( P
-                  { name = Owned (padding_ct, Uninit);
-                    pointer = IT.pointer_offset_ (pointer, IT.uintptr_int_ offset loc) loc;
-                    iargs = []
-                  },
-                O (IT.default_ (Memory.bt_of_sct padding_ct) loc) )
-            in
-            mresource :: res)
+           match member_or_padding with
+           | Some (member, mct) ->
+             let mresource =
+               ( P
+                   { name = Owned (mct, init);
+                     pointer = IT.memberShift_ (pointer, tag, member) loc;
+                     iargs = []
+                   },
+                 O (IT.member_ ~member_bt:(Memory.bt_of_sct mct) (o, member) loc) )
+             in
+             mresource :: res
+           | None ->
+             let padding_ct = Sctypes.Array (Sctypes.char_ct, Some size) in
+             let mresource =
+               ( P
+                   { name = Owned (padding_ct, Uninit);
+                     pointer =
+                       IT.pointer_offset_ (pointer, IT.uintptr_int_ offset loc) loc;
+                     iargs = []
+                   },
+                 O (IT.default_ (Memory.bt_of_sct padding_ct) loc) )
+             in
+             mresource :: res)
         layout
         []
     in
