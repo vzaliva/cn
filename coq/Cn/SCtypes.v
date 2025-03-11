@@ -117,6 +117,54 @@ Module SCtypes_as_MiniDecidableType <: MiniDecidableType.
   Definition eq := @eq t.
   Lemma eq_dec : forall (x y : t), { eq x y } + { ~ eq x y }.
   Proof.
-    admit.
-  Admitted.
+    unfold eq.
+    apply (ctype_ind_set (fun x => forall y, { x = y } + { x <> y })).
+    - intros y.
+      destruct y; try (right; discriminate).
+      left; reflexivity.
+    - intros i y.
+      destruct y; try (right; discriminate).
+      destruct (IntegerType_as_MiniDecidableType.eq_dec i i0) as [E | NE]; try (right; congruence).
+      inversion E; subst.
+      left; reflexivity.
+    - intros [x n] IH y.
+      destruct y; try (right; discriminate).
+      destruct p as [x' n'].
+      cbn in IH.      
+      destruct (IH x') as [E | NE]; try (right; congruence); subst.
+      destruct (option_eq_dec Nat_as_DT.eq_dec n n') as [En | NEn]; try (right; congruence); subst.
+      left; reflexivity.
+    - intros x IH y.
+      destruct y; try (right; discriminate).
+      destruct (IH y) as [E | NE]; try (right; congruence); subst.
+      left; reflexivity.
+    - intros s x.
+      destruct x; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [Es | NEs]; try (right; congruence).
+      inversion Es; subst.
+      left; reflexivity.
+    - intros [[[q x] l] b] IH IHl y.
+      destruct y; try (right; discriminate).
+      destruct p as [[[q' x'] l'] b'].
+      cbn in *.
+      revert l'.
+      induction IHl as [| [x1 b1] l IH' _ IHl]; intros l'.
+      + destruct l'; try (right; discriminate).
+        destruct (qualifiers_as_MiniDecidableType.eq_dec q q') as [Eq | NEq]; try (right; congruence).
+        inversion Eq; subst.
+        destruct (IH x') as [E | NE]; try (right; congruence); subst.
+        destruct (Bool.bool_dec b b') as [Eb | NEb]; try (right; congruence); subst.
+        left; reflexivity.
+      + destruct l'; try (right; discriminate).
+        destruct p as [x1' b1'].
+        destruct (qualifiers_as_MiniDecidableType.eq_dec q q') as [Eq | NEq]; try (right; congruence).
+        inversion Eq; subst.
+        destruct (IH x') as [E | NE]; try (right; congruence); subst.
+        destruct (Bool.bool_dec b b') as [Eb | NEb]; try (right; congruence); subst.
+        destruct (IH' x1') as [E | NE]; try (right; congruence); subst.
+        destruct (Bool.bool_dec b1 b1') as [Eb1 | NEb1]; try (right; congruence); subst.
+        destruct (IHl l') as [E | NE]; try (right; congruence).
+        inversion E; subst.
+        left; reflexivity.
+  Qed.
 End SCtypes_as_MiniDecidableType.
