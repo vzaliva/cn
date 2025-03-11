@@ -5,10 +5,12 @@ Require Import Cerberus.Symbol.
 Require Import Cerberus.IntegerType.
 Require Import Cerberus.Ctype.
 Require Import Sym.
+Require Import BaseTypes.
 (* Qualifiers *)
 Definition qualifiers := Ctype.qualifiers.
 
 (* C types *)
+Unset Elimination Schemes.
 Inductive ctype : Type :=
   | Void : ctype
   | Integer : integerType -> ctype
@@ -16,6 +18,39 @@ Inductive ctype : Type :=
   | Pointer : ctype -> ctype
   | Struct : sym -> ctype
   | SCFunction : (qualifiers * ctype) * (list (ctype * bool)) * bool -> ctype.
+Set Elimination Schemes.
+
+(* We define a custom induction principle for [ctype] because the
+   default one incorrectly handles hidden recursive cases for the
+   [Array] and [SCFunction] constructors. *)
+Theorem ctype_ind_set (P : ctype -> Type):
+  P Void ->
+  (forall i : integerType, P (Integer i)) ->
+  (forall p : ctype * option nat, P (fst p) -> P (Array p)) ->
+  (forall c : ctype, P c -> P (Pointer c)) ->
+  (forall s : sym, P (Struct s)) ->
+  (forall p : qualifiers * ctype * list (ctype * bool) * bool,
+    P (snd (fst (fst p))) ->
+    Forall_type (fun '(x, _) => P x) (snd (fst p)) -> 
+    P (SCFunction p))
+  -> forall t : ctype, P t.
+Proof.
+  intros HVoid HInteger HArray HPointer HStruct HSCFunction.
+  fix IH 1.
+  intros t.
+  destruct t.
+  - apply HVoid.
+  - apply HInteger.
+  - apply HArray, IH.
+  - apply HPointer, IH.
+  - apply HStruct.
+  - apply HSCFunction.
+    + apply IH.
+    + destruct p as [[[q c] l] b].
+      induction l as [| [c' b'] l IHl].
+      * constructor.
+      * constructor; auto.
+Qed.
 
 Definition t := ctype.
 
