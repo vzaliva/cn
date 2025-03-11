@@ -147,6 +147,13 @@ Proof.
   decide equality.
 Qed.
 
+Lemma option_eq_dec {A : Type}
+      (eqA : forall x y : A, {x = y} + {x <> y}) :
+      forall (o1 o2 : option A), {o1 = o2} + {o1 <> o2}.
+Proof.
+  decide equality.
+Qed.
+
 Module BasetTypes_t_as_MiniDecidableType <: MiniDecidableType.
   Definition t := t.
   Definition eq := @eq t.
