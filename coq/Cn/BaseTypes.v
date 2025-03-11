@@ -181,7 +181,49 @@ Module BasetTypes_t_as_MiniDecidableType <: MiniDecidableType.
       + right. intros H. inversion H. congruence.
     -
       (* TODO: this is not provavle with current induction principle! *)
-      admit.
+      clear x.
+      revert l0.
+      induction X;intros.
+      +
+        destruct l0.
+        * left. reflexivity.
+        * right. congruence.
+      +
+        destruct l0.
+        * right. congruence.
+        * destruct p0.
+          destruct x.
+          specialize (p t0).
+          specialize (IHX l0).
+          destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0).
+          --
+            inversion e.
+            subst.
+            inversion p.
+            ++
+              subst.
+              inversion IHX.
+              **
+                inversion H.
+                subst.
+                left.
+                reflexivity.
+              **
+                right.
+                intros C.
+                inversion C.
+                subst.
+                congruence.
+            ++
+              right.
+              intros C.
+              inversion C.
+              congruence.
+          --
+            right.
+            intros C.
+            inversion C.
+            congruence.
     -
       specialize (H y1).
       specialize (H0 y2).
@@ -258,7 +300,7 @@ Module BasetTypes_t_as_MiniDecidableType <: MiniDecidableType.
         intros C.
         inversion C.
         congruence.
-  Admitted.
+  Qed.
   
 End BasetTypes_t_as_MiniDecidableType.
 
