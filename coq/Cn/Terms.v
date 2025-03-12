@@ -72,6 +72,8 @@ Inductive binop : Type :=
   | SetMember : binop
   | Subset : binop.
 
+Unset Elimination Schemes.
+
 (* Patterns *)
 Inductive pattern_ (bt : Type) : Type :=
   | PSym : sym -> pattern_ bt
@@ -82,8 +84,6 @@ with pattern (bt : Type) : Type :=
   | Pat : pattern_ bt -> bt -> Locations.t -> pattern bt.
 
 (* Terms *)
-Unset Elimination Schemes.
-
 Inductive term (bt : Type) : Type :=
   | Const : const -> term bt
   | Sym : sym -> term bt
@@ -129,6 +129,33 @@ with annot (bt : Type) : Type :=
   | IT : term bt -> bt -> Locations.t -> annot bt.
 
 Set Elimination Schemes.
+
+(* We define a custom induction principle for [pattern_] to properly handle
+   mutual induction and constructors with hidden recursive cases. *)
+Theorem pattern__ind_set (ty : Type) (P : pattern_ ty -> Type) (P' : pattern ty -> Type) :
+  (forall (s : sym), P (PSym ty s)) ->
+  (P (PWild ty)) ->
+  (forall (s : sym) (l : list (Symbol.identifier * pattern ty)),
+    Forall_type (fun '(_, p) => P' p) l -> P (PConstructor ty s l)) ->
+  (forall (p : pattern_ ty) (tt : ty) (lc : Locations.t), P p -> P' (Pat ty p tt lc)) ->
+  forall p : pattern_ ty, P p.
+Proof.
+  intros HPSym HPWild HPConstructor HPPat.
+  fix IH 1.
+  intros p.
+  destruct p.
+  - apply HPSym.
+  - apply HPWild.
+  - clear - HPConstructor HPPat IH.
+    apply HPConstructor.
+    induction l.
+    + apply Forall_nil.
+    + destruct a as [i p].
+      destruct p.
+      apply Forall_cons.
+      * apply HPPat, IH.
+      * apply IHl.
+Qed.
 
 (* We define a custom induction principle for [term] to properly handle
    mutual induction and constructors with hidden recursive cases. *)
