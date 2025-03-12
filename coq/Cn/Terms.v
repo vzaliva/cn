@@ -2,7 +2,11 @@ Require Import ZArith.
 Require Import String.
 Require Import List.
 Require Import QArith.Qcanon.
+Require Import List.
+Require Import Coq.Structures.DecidableType.
+Require Import Coq.Structures.DecidableTypeEx.
 Require Import Cerberus.Symbol.
+Require Import Sym.
 Require Import BaseTypes.
 Require Import Cerberus.Location.
 Require Import SCtypes.
@@ -78,6 +82,8 @@ with pattern (bt : Type) : Type :=
   | Pat : pattern_ bt -> bt -> Locations.t -> pattern bt.
 
 (* Terms *)
+Unset Elimination Schemes.
+
 Inductive term (bt : Type) : Type :=
   | Const : const -> term bt
   | Sym : sym -> term bt
@@ -121,3 +127,201 @@ Inductive term (bt : Type) : Type :=
 
 with annot (bt : Type) : Type :=
   | IT : term bt -> bt -> Locations.t -> annot bt.
+
+Set Elimination Schemes.
+
+(* We define a custom induction principle for [term] to properly handle
+   mutual induction and constructors with hidden recursive cases. *)
+Theorem term_ind_set (ty : Type) (P : term ty -> Type) (P' : annot ty -> Type) :
+  (forall (c : const), P (Const ty c)) ->
+  (forall (s : sym), P (Sym ty s)) ->
+  (forall (u : unop) (a : annot ty), P' a -> P (Unop ty u a)) ->
+  (forall (b : binop) (a1 a2 : annot ty), P' a1 -> P' a2 -> P (Binop ty b a1 a2)) ->
+  (forall (a1 a2 a3 : annot ty), P' a1 -> P' a2 -> P' a3 -> P (ITE ty a1 a2 a3)) ->
+  (forall (p : nat * (sym * BaseTypes.t) * nat) (a : annot ty), P' a -> P (EachI ty p a)) ->
+  (forall (l : list (annot ty)), Forall_type (fun a => P' a) l -> P (Tuple ty l)) ->
+  (forall (n : nat) (a : annot ty), P' a -> P (NthTuple ty n a)) ->
+  (forall (s : sym) (l : list (identifier * annot ty)), Forall_type (fun '(_, a) => P' a) l -> P (Struct ty s l)) ->
+  (forall (a : annot ty) (i : identifier), P' a -> P (StructMember ty a i)) ->
+  (forall (p : annot ty * identifier) (a : annot ty), P' (fst p) -> P' a -> P (StructUpdate ty p a)) ->
+  (forall (l : list (identifier * annot ty)), Forall_type (fun '(_, a) => P' a) l -> P (TRecord ty l)) ->
+  (forall (a : annot ty) (i : identifier), P' a -> P (RecordMember ty a i)) ->
+  (forall (p : annot ty * identifier) (a : annot ty), P' (fst p) -> P' a -> P (RecordUpdate ty p a)) ->
+  (forall (s : sym) (l : list (identifier * annot ty)), Forall_type (fun '(_, a) => P' a) l -> P (Constructor ty s l)) ->
+  (forall (a : annot ty) (s : sym) (i : identifier), P' a -> P (MemberShift ty a s i)) ->
+  (forall (a1 : annot ty) (ct : SCtypes.t) (a2 : annot ty), P' a1 -> P' a2 -> P (ArrayShift ty a1 ct a2)) ->
+  (forall (a1 a2 : annot ty), P' a1 -> P' a2 -> P (CopyAllocId ty a1 a2)) ->
+  (forall (a : annot ty), P' a -> P (HasAllocId ty a)) ->
+  (forall (ct : SCtypes.t), P (SizeOf ty ct)) ->
+  (forall (s : sym) (i : identifier), P (OffsetOf ty s i)) ->
+  (forall (bt : BaseTypes.t), P (Nil ty bt)) ->
+  (forall (a1 a2 : annot ty), P' a1 -> P' a2 -> P (Cons ty a1 a2)) ->
+  (forall (a : annot ty), P' a -> P (Head ty a)) ->
+  (forall (a : annot ty), P' a -> P (Tail ty a)) ->
+  (forall (a1 a2 a3 : annot ty), P' a1 -> P' a2 -> P' a3 -> P (NthList ty a1 a2 a3)) ->
+  (forall (a1 a2 a3: annot ty), P' a1 -> P' a2 -> P' a3 -> P (ArrayToList ty a1 a2 a3)) ->
+  (forall (ct : SCtypes.t) (a : annot ty) , P' a -> P (Representable ty ct a)) ->
+  (forall (ct : SCtypes.t) (a : annot ty) , P' a -> P (Good ty ct a)) ->
+  (forall (a1 a2 : annot ty), P' a1 -> P' a2 -> P (Aligned ty a1 a2)) ->
+  (forall (i : IntegerType.t) (a : annot ty), P' a -> P (WrapI ty i a)) ->
+  (forall (bt : BaseTypes.t) (a : annot ty), P' a -> P (MapConst ty bt a)) ->
+  (forall (a1 a2 a3 : annot ty), P' a1 -> P' a2 -> P' a3 -> P (MapSet ty a1 a2 a3)) ->
+  (forall (a1 a2 : annot ty), P' a1 -> P' a2 -> P (MapGet ty a1 a2)) ->
+  (forall (p : sym * BaseTypes.t) (a : annot ty), P' a -> P (MapDef ty p a)) ->
+  (forall (s : sym) (l : list (annot ty)), Forall_type (fun a => P' a) l -> P (Apply ty s l)) ->
+  (forall (p : sym * annot ty) (a : annot ty), P' (snd p) -> P' a -> P (TLet ty p a)) ->
+  (forall (a : annot ty) (l : list (pattern ty * annot ty)), P' a -> Forall_type (fun '(_, a) => P' a) l -> P (TMatch ty a l)) ->
+  (forall (bt : BaseTypes.t) (a : annot ty), P' a -> P (Cast ty bt a)) ->
+  (forall (t : term ty) (tt : ty) (lc : Locations.t), P t -> P' (IT ty t tt lc)) ->
+  forall t : term ty, P t.
+Proof.
+  intros HConst HSym HUnop HBinop HITE HEachI HTuple HNthTuple HStruct
+         HStructMember HStructUpdate HTRecord HRecordMember HRecordUpdate
+         HConstructor HMemberShift HArrayShift HCopyAllocId HHasAllocId
+         HSizeOf HOffsetOf HNil HCons HHead HTail HNthList HArrayToList
+         HRepresentable HGood HAligned HWrapI HMapConst HMapSet HMapGet
+         HMapDef HApply HTLet HTMatch HCast HIT.
+  fix IH 1.
+  intros t.
+  destruct t.
+  - apply HConst.
+  - apply HSym.
+  - clear - HUnop HIT IH.
+    destruct a.
+    apply HUnop, HIT, IH.
+  - clear - HBinop HIT IH.
+    destruct a, a0.
+    apply HBinop; apply HIT, IH.
+  - clear - HITE HIT IH.
+    destruct a, a0, a1.
+    apply HITE; apply HIT, IH.
+  - clear - HEachI HIT IH.
+    destruct a.
+    apply HEachI, HIT, IH.
+  - clear - HTuple HIT IH.
+    apply HTuple.
+    induction l.
+    + apply Forall_nil.
+    + destruct a.
+      apply Forall_cons.
+      * apply HIT, IH.
+      * apply IHl.
+  - clear - HNthTuple HIT IH.
+    destruct a.
+    apply HNthTuple, HIT, IH.
+  - clear - HStruct HIT IH.
+    apply HStruct.
+    induction l.
+    + apply Forall_nil.
+    + destruct a as [? a], a.
+      apply Forall_cons.
+      * apply HIT, IH.
+      * apply IHl.
+  - clear - HStructMember HIT IH.
+    destruct a.
+    apply HStructMember, HIT, IH.
+  - clear - HStructUpdate HIT IH.
+    destruct a, p as [a1 ?], a1.
+    apply HStructUpdate; apply HIT, IH.
+  - clear - HTRecord HIT IH.
+    apply HTRecord.
+    induction l.
+    + apply Forall_nil.
+    + destruct a as [? a], a.
+      apply Forall_cons.
+      * apply HIT, IH.
+      * apply IHl.
+  - clear - HRecordMember HIT IH.
+    destruct a.
+    apply HRecordMember, HIT, IH.
+  - clear - HRecordUpdate HIT IH.
+    destruct a, p as [a1 ?], a1.
+    apply HRecordUpdate; apply HIT, IH.
+  - clear - HConstructor HIT IH.
+    apply HConstructor.
+    induction l.
+    + apply Forall_nil.
+    + destruct a as [? a], a.
+      apply Forall_cons.
+      * apply HIT, IH.
+      * apply IHl.
+  - clear - HMemberShift HIT IH.
+    destruct a.
+    apply HMemberShift; apply HIT, IH.
+  - clear - HArrayShift HIT IH.
+    destruct a, a0.
+    apply HArrayShift; apply HIT, IH.
+  - clear - HCopyAllocId HIT IH.
+    destruct a, a0.
+    apply HCopyAllocId; apply HIT, IH.
+  - clear - HHasAllocId HIT IH.
+    destruct a.
+    apply HHasAllocId; apply HIT, IH.
+  - apply HSizeOf.
+  - apply HOffsetOf.
+  - apply HNil.
+  - clear - HCons HIT IH.
+    destruct a, a0.
+    apply HCons; apply HIT, IH.
+  - clear - HHead HIT IH.
+    destruct a.
+    apply HHead; apply HIT, IH.
+  - clear - HTail HIT IH.
+    destruct a.
+    apply HTail; apply HIT, IH.
+  - clear - HNthList HIT IH.
+    destruct a, a0, a1.
+    apply HNthList; apply HIT, IH.
+  - clear - HArrayToList HIT IH.
+    destruct a, a0, a1.
+    apply HArrayToList; apply HIT, IH.
+  - clear - HRepresentable HIT IH.
+    destruct a.
+    apply HRepresentable, HIT, IH.
+  - clear - HGood HIT IH.
+    destruct a.
+    apply HGood, HIT, IH.
+  - clear - HAligned HIT IH.
+    destruct a, a0.
+    apply HAligned; apply HIT, IH.
+  - clear - HWrapI HIT IH.
+    destruct a.
+    apply HWrapI, HIT, IH.
+  - clear - HMapConst HIT IH.
+    destruct a.
+    apply HMapConst, HIT, IH.
+  - clear - HMapSet HIT IH.
+    destruct a, a0, a1.
+    apply HMapSet; apply HIT, IH.
+  - clear - HMapGet HIT IH.
+    destruct a, a0.
+    apply HMapGet; apply HIT, IH.
+  - clear - HMapDef HIT IH.
+    destruct a.
+    apply HMapDef, HIT, IH.
+  - clear - HApply HIT IH.
+    apply HApply.
+    induction l.
+    + apply Forall_nil.
+    + destruct a.
+      apply Forall_cons.
+      * apply HIT, IH.
+      * apply IHl.
+  - clear - HTLet HIT IH.
+    destruct a, p as [? a], a.
+    apply HTLet; apply HIT, IH.
+  - clear - HTMatch HIT IH.
+    destruct a.
+    apply HTMatch.
+    + apply HIT, IH.
+    + induction l.
+      * apply Forall_nil.
+      * destruct a as [? a], a.
+        apply Forall_cons.
+        -- apply HIT, IH.
+        -- apply IHl.
+  - clear - HCast HIT IH.
+    destruct a.
+    apply HCast; apply HIT, IH.
+Qed.
+
