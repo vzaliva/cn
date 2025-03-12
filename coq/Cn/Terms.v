@@ -470,3 +470,337 @@ Module Pattern_as_MiniDecidableType (Ty_as_MiniDecidableType : MiniDecidableType
   Qed.
 End Pattern_as_MiniDecidableType.
 
+Module Term_as_MiniDecidableType (Ty_as_MiniDecidableType : MiniDecidableType) <: MiniDecidableType.
+  Module Pattern_as_MiniDecidableType := Pattern_as_MiniDecidableType Ty_as_MiniDecidableType.
+  Definition ty := Ty_as_MiniDecidableType.t.
+
+  Lemma eq_dec : forall (x y : term ty), { eq x y } + { ~ eq x y }.
+  Proof.
+    apply (term_ind_set ty
+            (fun t1 => forall t2, { eq t1 t2 } + { ~ eq t1 t2 })
+            (fun a1 => forall a2, { eq a1 a2 } + { ~ eq a1 a2 })).
+    - intros c t0.
+      destruct t0; try (right; discriminate).
+      destruct (Const_as_MiniDecidableType.eq_dec c c0) as [E | ?]; try (right; congruence).
+      inversion E; subst; left; reflexivity.
+    - intros s t0.
+      destruct t0; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; left; reflexivity.
+    - intros u a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (Unop_as_MiniDecidableType.eq_dec u u0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros b a1 a2 IHa1 IHa2 t0.
+      destruct t0; try (right; discriminate).
+      destruct (Binop_as_MiniDecidableType.eq_dec b b0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 a3 IHa1 IHa2 IHa3 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      destruct (IHa3 a4); try (right; congruence); subst.
+      left; reflexivity.
+    - intros p a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct p as [[n1 [s bt]] n2].
+      destruct p0 as [[n1' [s' bt']] n2'].
+      destruct (Nat_as_DT.eq_dec n1 n1'); try (right; congruence).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (BasetTypes_t_as_MiniDecidableType.eq_dec bt bt') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (Nat_as_DT.eq_dec n2 n2'); try (right; congruence); subst.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros l IHl t0.
+      destruct t0; try (right; discriminate).
+      revert l0.
+      induction IHl as [| [t tt] l IH _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct (IH a) as [E | ?]; try (right; congruence).
+        destruct a.
+        inversion E; subst; clear E.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros n a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (Nat_as_DT.eq_dec n n0); try (right; congruence); subst.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros s l IHl t0.
+      destruct t0; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      revert l0.
+      induction IHl as [| [i a] l IHa _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct p as [i0 a0].
+        destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        destruct (IHa a0) as [E | ?]; try (right; congruence); subst.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros a i IHa t0. 
+      destruct t0; try (right; discriminate).
+      destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros p a1 IHa2 IHa1 t0.
+      destruct t0; try (right; discriminate).
+      destruct p as [a2 i].
+      destruct p0 as [a2' i'].
+      destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      cbn in *.
+      destruct (IHa2 a2'); try (right; congruence); subst.
+      destruct (IHa1 a); try (right; congruence); subst.
+      left; reflexivity.
+    - intros l IHl t0.
+      destruct t0; try (right; discriminate).
+      revert l0.
+      induction IHl as [| [i a] l IHa _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct p as [i0 a0].
+        destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        destruct (IHa a0) as [E | ?]; try (right; congruence); subst.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros a i IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros p a1 IHa2 IHa1 t0.
+      destruct t0; try (right; discriminate).
+      destruct p as [a2 i].
+      destruct p0 as [a2' i'].
+      destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      cbn in *.
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a2'); try (right; congruence); subst.
+      left; reflexivity.
+    - intros s l IHl t0.
+      destruct t0; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      revert l0.
+      induction IHl as [| [i a] l IHa _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct p as [i0 a0].
+        destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        destruct (IHa a0) as [E | ?]; try (right; congruence); subst.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros a s i IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 ct a2 IHa1 IHa2 t0.
+      destruct t0; try (right; discriminate).
+      destruct (SCtypes_as_MiniDecidableType.eq_dec ct t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 IHa1 IHa2 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros ct t0.
+      destruct t0; try (right; discriminate).
+      destruct (SCtypes_as_MiniDecidableType.eq_dec ct t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      left; reflexivity.
+    - intros s i t0.
+      destruct t0; try (right; discriminate).
+      destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      left; reflexivity.
+    - intros bt t0.
+      destruct t0; try (right; discriminate).
+      destruct (BasetTypes_t_as_MiniDecidableType.eq_dec bt t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      left; reflexivity.
+    - intros a1 a2 IHa1 IHa2 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 a3 IHa1 IHa2 IHa3 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      destruct (IHa3 a4); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 a3 IHa1 IHa2 IHa3 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      destruct (IHa3 a4); try (right; congruence); subst.
+      left; reflexivity.
+    - intros ct a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (SCtypes_as_MiniDecidableType.eq_dec ct t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros ct a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (SCtypes_as_MiniDecidableType.eq_dec ct t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 IHa1 IHa2 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros it a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (IntegerType_as_MiniDecidableType.eq_dec it t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros bt a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (BasetTypes_t_as_MiniDecidableType.eq_dec bt t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 a3 IHa1 IHa2 IHa3 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      destruct (IHa3 a4); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 a2 IHa1 IHa2 t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa1 a); try (right; congruence); subst.
+      destruct (IHa2 a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros p a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct p as [s bt].
+      destruct p0 as [s' bt'].
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (BasetTypes_t_as_MiniDecidableType.eq_dec bt bt') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros s l IHl t0.
+      destruct t0; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      revert l0.
+      induction IHl as [| [t tt] l IHa _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct (IHa a) as [E | ?]; try (right; congruence).
+        destruct a.
+        inversion E; subst; clear E.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros p a IHa2 IHa1 t0.
+      destruct t0; try (right; discriminate).
+      destruct p as [s a2].
+      destruct p0 as [s' a2'].
+      cbn in *.
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s') as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa1 a0); try (right; congruence); subst.
+      destruct (IHa2 a2'); try (right; congruence); subst.
+      left; reflexivity.
+    - intros a1 l IHa IHl t0.
+      destruct t0; try (right; discriminate).
+      destruct (IHa a); try (right; congruence); subst.
+      revert l0.
+      induction IHl as [| [p a2] l IHa2 _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct p0 as [p' a2'].
+        destruct (Pattern_as_MiniDecidableType.eq_dec p p') as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        destruct (IHa2 a2'); try (right; congruence); subst.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros bt a IHa t0.
+      destruct t0; try (right; discriminate).
+      destruct (BasetTypes_t_as_MiniDecidableType.eq_dec bt t) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHa a0); try (right; congruence); subst.
+      left; reflexivity.
+    - intros t tt lc IHt a.
+      destruct a; try (right; discriminate).
+      destruct (Ty_as_MiniDecidableType.eq_dec tt t1); try (right; congruence); subst.
+      destruct (Locations_t_as_MiniDecidableType.eq_dec lc t2) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (IHt t0); try (right; congruence); subst.
+      left; reflexivity.
+  Qed.
+
+  Definition t := term ty.
+  Definition eq := @eq t.
+End Term_as_MiniDecidableType.
+
+Module Annot_as_MiniDecidableType (Ty_as_MiniDecidableType : MiniDecidableType) <: MiniDecidableType.
+  Module Term_as_MiniDecidableType := Term_as_MiniDecidableType Ty_as_MiniDecidableType.
+  Definition ty := Ty_as_MiniDecidableType.t.
+  Definition t := annot ty.
+  Definition eq := @eq t.
+  Lemma eq_dec : forall (x y : t), { eq x y } + { ~ eq x y }.
+  Proof.
+    unfold eq.
+    intros [t1 tt1 lc1] [t2 tt2 lc2].
+    destruct (Term_as_MiniDecidableType.eq_dec t1 t2); try (right; congruence); subst.
+    destruct (Ty_as_MiniDecidableType.eq_dec tt1 tt2); try (right; congruence); subst.
+    destruct (Locations_t_as_MiniDecidableType.eq_dec lc1 lc2) as [E | NE]; try (right; congruence).
+    inversion E; subst; left; reflexivity.
+  Qed.
+End Annot_as_MiniDecidableType.
