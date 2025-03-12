@@ -352,3 +352,121 @@ Proof.
     apply HCast; apply HIT, IH.
 Qed.
 
+Module Const_as_MiniDecidableType <: MiniDecidableType.
+  Definition t := const.
+  Definition eq := @eq t.
+  Lemma eq_dec : forall (x y : t), { eq x y } + { ~ eq x y }.
+  Proof.
+    unfold eq.
+    intros x y.
+    destruct x, y; try (right; discriminate).
+    - destruct (Z_as_DT.eq_dec z z0); try (right; congruence); subst.
+      left; reflexivity.
+    - destruct p as [[s n] z], p0 as [[s' n'] z'].
+      destruct (Nat_as_DT.eq_dec n n'); try (right; congruence); subst.
+      destruct (sign_eq_dec s s'); try (right; congruence); subst.
+      destruct (Z_as_DT.eq_dec z z'); try (right; congruence); subst.
+      left; reflexivity.
+    - destruct (Qc_eq_dec q q0); try (right; congruence); subst.
+      left; reflexivity.
+    - destruct p as [z1 z2], p0 as [z1' z2'].
+      destruct (Z_as_DT.eq_dec z1 z1'); try (right; congruence); subst.
+      destruct (Z_as_DT.eq_dec z2 z2'); try (right; congruence); subst.
+      left; reflexivity.
+    - destruct p as [z1 z2], p0 as [z1' z2'].
+      destruct (Z_as_DT.eq_dec z1 z1'); try (right; congruence); subst.
+      destruct (Z_as_DT.eq_dec z2 z2'); try (right; congruence); subst.
+      left; reflexivity.
+    - destruct (Z_as_DT.eq_dec z z0); try (right; congruence); subst.
+      left; reflexivity.
+    - destruct (Bool.bool_dec b b0); try (right; congruence); subst.
+      left; reflexivity.
+    - left; reflexivity.
+    - left; reflexivity.
+    - destruct (SCtypes_as_MiniDecidableType.eq_dec c c0) as [E | NE]; try (right; congruence).
+      inversion E; subst; left; reflexivity.
+    - destruct (BasetTypes_t_as_MiniDecidableType.eq_dec t0 t1) as [E | NE]; try (right; congruence).
+      inversion E; subst; left; reflexivity.
+  Qed.
+End Const_as_MiniDecidableType.
+
+Module Unop_as_MiniDecidableType <: MiniDecidableType.
+  Definition t := unop.
+  Definition eq := @eq t.
+  Lemma eq_dec : forall (x y : t), { eq x y } + { ~ eq x y }.
+  Proof.
+    unfold eq.
+    decide equality.
+  Qed.
+End Unop_as_MiniDecidableType.
+
+Module Binop_as_MiniDecidableType <: MiniDecidableType.
+  Definition t := binop.
+  Definition eq := @eq t.
+  Lemma eq_dec : forall (x y : t), { eq x y } + { ~ eq x y }.
+  Proof.
+    unfold eq.
+    decide equality.
+  Qed.
+End Binop_as_MiniDecidableType.
+
+Module Pattern__as_MiniDecidableType (Ty_as_MiniDecidableType : MiniDecidableType) <: MiniDecidableType.
+  Definition ty := Ty_as_MiniDecidableType.t.
+
+  Lemma eq_dec : forall (x y : pattern_ ty), { eq x y } + { ~ eq x y }.
+  Proof.
+    apply (pattern__ind_set ty
+      (fun p1 => forall p2, { eq p1 p2 } + { ~ eq p1 p2 })
+      (fun p1 => forall p2, { eq p1 p2 } + { ~ eq p1 p2 })).
+    - intros s p0.
+      destruct p0; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; left; reflexivity.
+    - intros p0.
+      destruct p0; try (right; discriminate).
+      left; reflexivity.
+    - intros s l IHl p0.
+      destruct p0; try (right; discriminate).
+      destruct (Sym_t_as_MiniDecidableType.eq_dec s s0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      revert l0.
+      induction IHl as [| [i p] l IHp _ IHl]; intros l0.
+      + destruct l0; try (right; discriminate).
+        left; reflexivity.
+      + destruct l0; try (right; discriminate).
+        destruct p0 as [i0 p0].
+        destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        destruct (IHp p0) as [E | ?]; try (right; congruence); subst.
+        destruct (IHl l0) as [E | ?]; try (right; congruence).
+        inversion E; subst; clear E.
+        left; reflexivity.
+    - intros p tt lc IHp p0.
+      destruct p0; try (right; discriminate).
+      destruct (Locations_t_as_MiniDecidableType.eq_dec lc t0) as [E | ?]; try (right; congruence).
+      inversion E; subst; clear E.
+      destruct (Ty_as_MiniDecidableType.eq_dec tt t) as [E | ?]; try (right; congruence); subst.
+      destruct (IHp p0); try (right; congruence); subst.
+      left; reflexivity.
+  Qed.
+
+  Definition t := pattern_ ty.
+  Definition eq := @eq t.
+End Pattern__as_MiniDecidableType.
+
+Module Pattern_as_MiniDecidableType (Ty_as_MiniDecidableType : MiniDecidableType) <: MiniDecidableType.
+  Module Pattern__as_MiniDecidableType := Pattern__as_MiniDecidableType Ty_as_MiniDecidableType.
+  Definition ty := Ty_as_MiniDecidableType.t.
+  Definition t := pattern ty.
+  Definition eq := @eq t.
+  Lemma eq_dec : forall (x y : t), { eq x y } + { ~ eq x y }.
+  Proof.
+    unfold eq.
+    intros [p1 tt1 lc1] [p2 tt2 lc2].
+    destruct (Pattern__as_MiniDecidableType.eq_dec p1 p2); try (right; congruence); subst.
+    destruct (Ty_as_MiniDecidableType.eq_dec tt1 tt2); try (right; congruence); subst.
+    destruct (Locations_t_as_MiniDecidableType.eq_dec lc1 lc2) as [E | NE]; try (right; congruence).
+    inversion E; subst; left; reflexivity.
+  Qed.
+End Pattern_as_MiniDecidableType.
+
