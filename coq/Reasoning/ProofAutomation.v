@@ -136,6 +136,15 @@ Ltac2 prove_unfold_step () :=
   match! goal with
   | [ |- log_entry_valid (ResourceInferenceStep _ (PredicateRequest _ 
       {| 
+        Predicate.name := Request.Owned (SCtypes.Array ?p) ?iinit;
+        Predicate.pointer := ?ipointer; Predicate.iargs := ?iargs 
+      |}
+      _ _) _) ] =>
+        Message.print (Message.of_string "Arrays are not supported yet");
+        (* Std.constructor false *)
+        Control.shelve ()
+  | [ |- log_entry_valid (ResourceInferenceStep _ (PredicateRequest _ 
+      {| 
         Predicate.name := Request.Owned (SCtypes.Struct ?isym) ?iinit;
         Predicate.pointer := ?ipointer; Predicate.iargs := ?iargs 
       |}
