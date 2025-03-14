@@ -141,8 +141,7 @@ Ltac2 prove_unfold_step () :=
       |}
       _ _) _) ] =>
         Message.print (Message.of_string "Arrays are not supported yet");
-        (* Std.constructor false *)
-        Control.shelve ()
+        Std.constructor_n false 2 NoBindings (* apply array_resource_inference_step *)
   | [ |- log_entry_valid (ResourceInferenceStep _ (PredicateRequest _ 
       {| 
         Predicate.name := Request.Owned (SCtypes.Struct ?isym) ?iinit;
@@ -152,7 +151,7 @@ Ltac2 prove_unfold_step () :=
        (* PredicateRequest case *)
        verbose_print "Checking PredicateRequest for Struct";
        verbose_print_constr "    Predicate symbol name: " isym;
-       Std.constructor_n false 2 NoBindings; (* apply struct_resource_inference_step *)
+       Std.constructor_n false 3 NoBindings; (* apply struct_resource_inference_step *)
        Control.focus 1 1 (fun () => Std.reflexivity ());
        Control.focus 1 1 (fun () => Std.reflexivity ());
        Control.focus 1 1 (fun () => Std.reflexivity ());
