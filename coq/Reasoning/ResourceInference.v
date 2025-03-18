@@ -94,11 +94,6 @@ Inductive struct_piece_to_resource
   bt_of_sct_rel pty field_bt ->
 
   let struct_type := (BaseTypes.Struct _ tag) in
-  (* let piece_sym := (Terms.Sym _ symbol) in *)
-
-  (* struct_s should be equal to id_name from struct_loc? *)
-  (* SymMap.MapsTo symbol (Context.BaseType piece_type, (struct_loc, struct_s)) logical *)
-
 
     struct_piece_to_resource piece iinit ipointer iargs tag loc
       (Resource.O (Terms.IT _ struct_term struct_type struct_loc))
