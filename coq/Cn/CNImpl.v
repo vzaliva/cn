@@ -117,7 +117,7 @@ Module CNImpl <: Implementation.
   Definition typeof_enum_impl (_:Symbol.sym)
              := Signed Int_.
 
-  Program Definition get :=
+  Definition get :=
     {|
       name            := "clang11_aarch64-unknown-freebsd13";
       details         := "clang version 11.0.0\nTarget: Morello";
