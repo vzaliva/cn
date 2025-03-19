@@ -120,7 +120,7 @@ Module CNImpl <: Implementation.
   Definition get :=
     {|
       name            := "clang11_aarch64-unknown-freebsd13";
-      details         := "clang version 11.0.0\nTarget: Morello";
+      details         := "clang version 11.0.0";
       sizeof_pointer  := 8;
       alignof_pointer := 8;
       is_signed_ity   := is_signed_ity_impl;
