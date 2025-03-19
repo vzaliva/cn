@@ -12,7 +12,8 @@ From Cerberus Require Import Implementation IntegerType Ctype Symbol.
 
 Local Open Scope nat_scope.
 
-Module CNImpl : Implementation.
+(* This is an instance of the Implementation module matching the implementation used in OCaml *)
+Module CNImpl <: Implementation.
 
   Definition is_signed_ity_impl ity :=
     match ity with
