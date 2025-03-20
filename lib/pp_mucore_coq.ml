@@ -2194,10 +2194,7 @@ let pp_unpack_result (r : Prooflog.unpack_result) =
 
 
 let pp_unfold_step (s : Prooflog.unfold_step) =
-  pp_pair
-    (pp_list (pp_triple pp_int pp_resource pp_unpack_result))
-    (pp_list pp_resource)
-    s
+  pp_pair (pp_list (pp_pair pp_resource pp_unpack_result)) (pp_list pp_resource) s
 
 
 let pp_resource_inference_type = function
@@ -2253,7 +2250,7 @@ let pp_proof_log (steps : Prooflog.log) (generate_proof : bool) =
   ^^ coq_def
        (coq_steps_var_name ^ ":Prooflog.log")
        P.empty
-       (pp_list pp_resource_inference_step steps)
+       (pp_list pp_resource_inference_step (List.rev steps))
   ^^ P.hardline
   ^^
   if generate_proof then
