@@ -114,7 +114,7 @@ Proof.
     + constructor; auto.
   - (* TSet *)
     apply HTSet; apply IH.
-Qed.
+Defined.
 
 
 Definition member_types_gen (A:Type) := list (Id.t * t_gen A).
@@ -136,13 +136,20 @@ Definition t := t_gen unit.
 Fact sign_eq_dec (s1 s2 : sign) : {s1 = s2} + {s1 <> s2}.
 Proof.
   decide equality.
-Qed.
+Defined.
 
 (* TODO Check if needed *)
 Lemma prod_eq_dec {A B : Type}
       (eqA : forall x y : A, {x = y} + {x <> y})
       (eqB : forall x y : B, {x = y} + {x <> y}) :
       forall (p1 p2 : A * B), {p1 = p2} + {p1 <> p2}.
+Proof.
+  decide equality.
+Defined.
+
+Lemma option_eq_dec {A : Type}
+      (eqA : forall x y : A, {x = y} + {x <> y}) :
+      forall (o1 o2 : option A), {o1 = o2} + {o1 <> o2}.
 Proof.
   decide equality.
 Qed.
@@ -180,8 +187,49 @@ Module BasetTypes_t_as_MiniDecidableType <: MiniDecidableType.
       + left; reflexivity.
       + right. intros H. inversion H. congruence.
     -
-      (* TODO: this is not provavle with current induction principle! *)
-      admit.
+      clear x.
+      revert l0.
+      induction X;intros.
+      +
+        destruct l0.
+        * left. reflexivity.
+        * right. congruence.
+      +
+        destruct l0.
+        * right. congruence.
+        * destruct p0.
+          destruct x.
+          specialize (p t0).
+          specialize (IHX l0).
+          destruct (Symbol_identifier_as_MiniDecidableType.eq_dec i i0).
+          --
+            inversion e.
+            subst.
+            inversion p.
+            ++
+              subst.
+              inversion IHX.
+              **
+                inversion H.
+                subst.
+                left.
+                reflexivity.
+              **
+                right.
+                intros C.
+                inversion C.
+                subst.
+                congruence.
+            ++
+              right.
+              intros C.
+              inversion C.
+              congruence.
+          --
+            right.
+            intros C.
+            inversion C.
+            congruence.
     -
       specialize (H y1).
       specialize (H0 y2).
@@ -258,7 +306,7 @@ Module BasetTypes_t_as_MiniDecidableType <: MiniDecidableType.
         intros C.
         inversion C.
         congruence.
-  Admitted.
+  Defined.
   
 End BasetTypes_t_as_MiniDecidableType.
 

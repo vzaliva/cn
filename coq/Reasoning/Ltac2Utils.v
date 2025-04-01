@@ -105,29 +105,48 @@ end.
  @return A tuple (a, b) containing the first and second component of the pair.
  @raise An exception if parameter is not a fully applied pair
  *)
- Ltac2 destruct_pair (t : constr) :=
- match Constr.Unsafe.kind t with
- | Constr.Unsafe.App f args =>
-     let pair_constr := constr:(@pair) in
-     let pair_constr_name := get_constructor_name pair_constr in
-     let f_name := get_constructor_name f in
-     if Constr.equal f_name pair_constr_name then
-       if Int.equal (Array.length args) 4 then
-         let a := Array.get args 2 in
-         let b := Array.get args 3 in
-         (a, b)
-       else
-         Control.throw (Tactic_failure (Some (Message.of_string "Term is not a fully applied pair")))
-     else
-       Control.throw (Tactic_failure (Some (Message.of_string "Term is not a pair")))
- | _ =>
-     Control.throw (Tactic_failure (Some (Message.of_string "Term is not an application (and thus not a pair)")))
- end.
+Ltac2 destruct_pair (t : constr) :=
+  match Constr.Unsafe.kind t with
+  | Constr.Unsafe.App f args =>
+    let pair_constr := constr:(@pair) in
+    let pair_constr_name := get_constructor_name pair_constr in
+    let f_name := get_constructor_name f in
+    if Constr.equal f_name pair_constr_name then
+      if Int.equal (Array.length args) 4 then
+        let a := Array.get args 2 in
+        let b := Array.get args 3 in
+        (a, b)
+      else
+        Control.throw (Tactic_failure (Some (Message.of_string "Term is not a fully applied pair")))
+    else
+      Control.throw (Tactic_failure (Some (Message.of_string "Term is not a pair")))
+  | _ =>
+    Control.throw (Tactic_failure (Some (Message.of_string "Term is not an application (and thus not a pair)")))
+  end.
  
  (* Ident to constant reference *)
- Ltac2 const_to_const_reference  (x:constr) :=  
-  match Constr.Unsafe.kind x with
-  | Constr.Unsafe.Constant c _ => Std.ConstRef c
-  | _ => Control.throw (Tactic_failure (Some (Message.of_string "Term is not a constant")))
+Ltac2 const_to_const_reference  (x:constr) :=  
+ match Constr.Unsafe.kind x with
+ | Constr.Unsafe.Constant c _ => Std.ConstRef c
+ | _ => Control.throw (Tactic_failure (Some (Message.of_string "Term is not a constant")))
+ end.
+
+(* given list of `constr`s and decidable equlity pose equality proof for each pair *)
+Ltac2 rec pairwise_decidability (eq_dec : constr) (lst : constr list) : unit :=
+  let rec pairwise_decidability_aux (x : constr) (lst : constr list) : unit :=
+    match lst with
+    | [] => ()
+    | y :: ys =>
+      let h := Fresh.in_goal @H in
+      Std.remember false (Some h) (fun _ => constr:($eq_dec $x $y)) None { on_hyps := None; on_concl := AllOccurrences };
+      ltac1:(h |- destruct h as [h | h]; try inversion h) (Ltac1.of_ident h);
+      pairwise_decidability_aux x ys
+    end 
+  in
+  match lst with
+  | [] => ()
+  | x :: xs =>
+    pairwise_decidability_aux x xs;
+    pairwise_decidability eq_dec xs
   end.
 
