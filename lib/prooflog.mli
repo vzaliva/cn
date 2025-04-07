@@ -34,6 +34,6 @@ val simplify_proof_log_entry : Simplify.simp_ctxt -> log_entry -> log_entry
 
 val simplify_proof_log : Simplify.simp_ctxt -> log -> log
 
-val simplify_inner_proof_log_entry : Simplify.simp_ctxt -> log_entry -> log_entry
+val simplify_hints_proof_log_entry : Simplify.simp_ctxt -> log_entry -> log_entry
 
-val simplify_inner_proof_log : Simplify.simp_ctxt -> log -> log
+val simplify_hints_proof_log : Simplify.simp_ctxt -> log -> log

@@ -460,7 +460,7 @@ module General = struct
        under anything, so we need to record them separately. *)
     let@ simp_ctxt = simp_ctxt () in
     if Prooflog.is_enabled () then (
-      let l_simp = Prooflog.simplify_inner_proof_log simp_ctxt l in
+      let l_simp = Prooflog.simplify_hints_proof_log simp_ctxt l in
       List.iter Prooflog.record_resource_inference_step l_simp)
     else
       ();

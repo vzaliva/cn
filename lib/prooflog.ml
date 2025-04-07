@@ -56,7 +56,7 @@ let rec simplify_proof_log_entry simp_ctxt log_entry =
 and simplify_proof_log simp_ctxt log = List.map (simplify_proof_log_entry simp_ctxt) log
 
 (* these versions of functions simplify only the inner proof log steps, which are used for hints *)
-let simplify_inner_proof_log_entry simp_ctxt log_entry =
+let simplify_hints_proof_log_entry simp_ctxt log_entry =
   match log_entry with
   | PredicateRequest (ic, s, req, r, log, oc) ->
     let log_simp = simplify_proof_log simp_ctxt log in
@@ -64,5 +64,5 @@ let simplify_inner_proof_log_entry simp_ctxt log_entry =
   | _ -> log_entry
 
 
-let simplify_inner_proof_log simp_ctxt log =
-  List.map (simplify_inner_proof_log_entry simp_ctxt) log
+let simplify_hints_proof_log simp_ctxt log =
+  List.map (simplify_hints_proof_log_entry simp_ctxt) log
