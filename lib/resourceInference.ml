@@ -420,19 +420,16 @@ module General = struct
       let@ c = get_typing_context () in
       let@ result = predicate_request loc uiinfo request in
       let@ c' = get_typing_context () in
-      let@ simp_ctxt = simp_ctxt () in
       return
         (Option.map
-           (fun ((p, Resource.O o), changed_or_deleted, l) ->
+           (fun ((p, o), changed_or_deleted, l) ->
               let hints =
                 if Prooflog.is_enabled () then
-                  let p = Simplify.Request.Predicate.simp simp_ctxt p in
-                  let o = Simplify.IndexTerms.simp simp_ctxt o in
-                  [ Prooflog.PredicateRequest (c, fst uiinfo, request, (p, Resource.O o), l, c') ]
+                  [ Prooflog.PredicateRequest (c, fst uiinfo, request, (p, o), l, c') ]
                 else
                   []
               in
-              ((Req.P p, Resource.O o), changed_or_deleted, hints))
+              ((Req.P p, o), changed_or_deleted, hints))
            result)
     | Q request ->
       let@ result = qpredicate_request loc uiinfo request in
