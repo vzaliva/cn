@@ -425,12 +425,10 @@ module General = struct
         (Option.map
            (fun ((p, Resource.O o), changed_or_deleted, l) ->
               let hints =
-                if Prooflog.is_enabled () then (
+                if Prooflog.is_enabled () then
                   let p = Simplify.Request.Predicate.simp simp_ctxt p in
                   let o = Simplify.IndexTerms.simp simp_ctxt o in
-                  [ Prooflog.PredicateRequest
-                      (c, fst uiinfo, request, (p, Resource.O o), l, c')
-                  ])
+                  [ Prooflog.PredicateRequest (c, fst uiinfo, request, (p, Resource.O o), l, c') ]
                 else
                   []
               in
