@@ -521,6 +521,34 @@ Inductive unfold_one (globals:Global.t): Resource.t -> ResSet.t -> Prop :=
          iout)
       out_res.
 
+Definition apply_for_subsumed (iinit: init) (f : init -> bool) : bool :=
+  match iinit with
+  | Init => f Init
+  | Uninit => f Uninit || f Init
+  end.
+
+Lemma apply_for_subsumed_spec:
+  forall iinit f t, apply_for_subsumed iinit f = true ->
+  exists iinit', subsumed (Owned t iinit) (Owned t iinit') /\ f iinit' = true.
+Proof.
+  intros iinit f t H.
+  unfold apply_for_subsumed in H.
+  destruct iinit.
+  - exists Init; split.
+    + apply Subsumed_equal.
+      reflexivity.
+    + apply H.
+  - apply orb_true_iff in H as [H | H].
+    + exists Uninit; split.
+      * apply Subsumed_equal.
+        reflexivity.
+      * apply H.
+    + exists Init; split.
+      * apply Subsumed_owned.
+        reflexivity.
+      * apply H.
+Qed.
+
 (* Computable version of unfold_one predicate *) 
 Definition unfold_one_fun (globals:Global.t) (r : Resource.t) (out_res: list Resource.t) : bool :=
   match r with
@@ -532,9 +560,10 @@ Definition unfold_one_fun (globals:Global.t) (r : Resource.t) (out_res: list Res
         match SymMap.find isym globals.(Global.struct_decls) with
         | Some sdecl =>
           (List.length sdecl =? List.length out_res) &&
-          List.forallb
-            (fun '(piece, r) => struct_piece_to_resource_fun piece iinit ipointer iargs isym iout r)
-            (List.combine sdecl out_res)
+          apply_for_subsumed iinit (fun iinit' =>
+            List.forallb
+              (fun '(piece, r) => struct_piece_to_resource_fun piece iinit' ipointer iargs isym iout r)
+              (List.combine sdecl out_res))
         | None => false
         end
   | _ => false
@@ -559,9 +588,10 @@ Proof.
   apply SymMap.find_2 in Hf.
   assert (piece_def : Memory.struct_piece) by (repeat constructor).
   assert (res_def : Resource.t) by (repeat constructor).
-  eapply unfold_one_struct with (iinit' := i).
-  { apply Subsumed_equal.
-    reflexivity. }
+  apply apply_for_subsumed_spec with (t := Struct s) in H.
+  destruct H as [i' [Hi H]]. 
+  eapply unfold_one_struct with (iinit' := i').
+  { apply Hi. }
   { apply Hf. }
   intros r; split.
   - intros Hr.
