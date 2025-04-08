@@ -15,10 +15,13 @@ Import ListNotations.
 Inductive provable (g:Global.t): LCSet.t -> LogicalConstraints.t -> Prop :=
 | solvable_SMT: forall lc it, provable g lc it.
 
+(* Helper function to get a list of resources from the contex *)
+Definition ctx_resources_list (l: (list (Resource.t * Z)) * Z) : list Resource.t :=
+  List.map fst (fst l).
+
 (* Helper function to get a set of resources from the contex *)
-Definition ctx_resources_set (l:((list (Resource.t * Z)) * Z)) : ResSet.t
-  :=
-  Resource.set_from_list (List.map fst (fst l)).
+Definition ctx_resources_set (l: (list (Resource.t * Z)) * Z) : ResSet.t :=
+  Resource.set_from_list (ctx_resources_list l).
 
 Inductive term_is_struct: Terms.term BaseTypes.t -> Prop :=
 | term_is_struct_intro: forall tag fields,
@@ -856,6 +859,40 @@ Qed.
 
 Definition unfold_step_flatten (l : list unfold_step): unfold_changed :=
   List.concat (List.map fst l).
+
+Definition get_resources_from_log (log_entries : log) : list Resource.t :=
+  List.fold_right (fun log_entry rs =>
+    match log_entry with
+    | PredicateRequest _ _ _ (p, o) _ _ => (Request.P p, o) :: rs
+    | UnfoldResources _ _ _ _ => rs (* probably shouldn't happen *)
+    end) [] log_entries.
+
+Definition resource_set_init (r : Resource.t) : Resource.t :=
+  match r with
+  | (Request.P {| Predicate.name := Request.Owned t _;
+                  Predicate.pointer := p;
+                  Predicate.iargs := args |}, out) =>
+    (Request.P {| Predicate.name := Request.Owned t Init;
+                  Predicate.pointer := p;
+                  Predicate.iargs := args |}, out)
+  | r => r
+  end.
+
+Definition resource_set_correct_init_status (c : Context.t) (r : Resource.t) : Resource.t := 
+  if List.existsb (fun r' => bool_of_sum (Resource_as_DecidableType.eq_dec r r')) (ctx_resources_list c.(resources))
+  then r
+  else resource_set_init r.
+
+Fixpoint get_hints_from_log_entry (log_entry : log_entry) : unfold_changed :=
+  match log_entry with
+  | PredicateRequest _ _ _ _ [] _ => []
+  | PredicateRequest ic _ _ (p, o) log_entries _ =>
+      let r := (Request.P p, o) in
+      let unfolded_r := List.map (resource_set_correct_init_status ic) (get_resources_from_log log_entries) in
+      let hints_inner := List.concat (List.map get_hints_from_log_entry log_entries) in
+      (r, UnpackRES unfolded_r) :: hints_inner
+  | UnfoldResources _ _ _ _ => [] (* probably shouldn't happen *)
+  end.
 
 (** Inductive predicate which defines correctness of resource unfolding step *)
 Inductive unfold_step : Context.t -> Context.t -> Prop :=
