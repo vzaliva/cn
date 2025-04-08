@@ -646,6 +646,87 @@ Inductive unfold_all (globals:Global.t): ResSet.t -> ResSet.t -> Prop :=
     ResSet.Equal input output ->
     unfold_all globals input output.
 
+Lemma unfold_one_Proper : Proper (eq ==> eq ==> ResSet.Equal ==> iff) unfold_one.
+Proof.
+  intros globals globals' Hglobals r r' Hr rs rs' Hrs.
+  subst r' globals'.
+  enough (forall r rs rs', ResSet.Equal rs rs' -> unfold_one globals r rs -> unfold_one globals r rs') as H.
+  { split; intros H1.
+    - eapply H.
+      + apply Hrs.
+      + apply H1.
+    - eapply H.
+      + symmetry; apply Hrs.
+      + apply H1. }
+  clear.
+  intros r rs rs' Hrs H.
+  inversion H; subst; clear H.
+  econstructor; eauto.
+  intros r; split; intros Hr.
+  - apply H2.
+    eapply ResSetDecide.F.In_m.
+    + reflexivity.
+    + apply Hrs.
+    + apply Hr.
+  - eapply ResSetDecide.F.In_m.
+    + reflexivity.
+    + symmetry.
+      apply Hrs.
+    + apply H2, Hr.
+Qed.
+
+Lemma unfold_all_Proper : Proper (eq ==> ResSet.Equal ==> ResSet.Equal ==> iff) unfold_all.
+Proof.
+  intros globals globals' Hglobals r1 r1' Hr1 r2 r2' Hr2.
+  subst globals'.
+  enough (forall r1 r1' r2 r2', ResSet.Equal r1 r1' -> ResSet.Equal r2 r2' ->
+          unfold_all globals r1 r2 -> unfold_all globals r1' r2') as H.
+  { split; intros H1.
+    - eapply H.
+      + apply Hr1.
+      + apply Hr2.
+      + apply H1.
+    - eapply H.
+      + symmetry; apply Hr1.
+      + symmetry; apply Hr2.
+      + apply H1. }
+  clear.
+  intros r1 r1' r2 r2' Hr1 Hr2 H.
+  revert r1' r2' Hr1 Hr2.
+  induction H; intros r1' r2' Hr1 Hr2.
+  - eapply unfold_all_step with (input' := input').
+    + apply Hr1, H.
+    + apply H0.
+    + ResSetDecide.fsetdec.
+    + apply IHunfold_all.
+      * reflexivity.
+      * apply Hr2.
+  - apply unfold_all_fixpoint.
+    + intros H1.
+      apply H.
+      destruct H1 as [r [Hr H1]].
+      exists r; split; try assumption.
+      apply Hr1, Hr.
+    + transitivity input.
+      { apply Equivalence_Symmetric, Hr1. }
+      transitivity output.
+      { apply H0. }
+      apply Hr2.
+Qed. 
+
+Lemma unfold_all_singleton_eq:
+  forall globals r output,
+  unfold_all globals (Resource.set_from_list [r]) output <->
+  unfold_all globals (ResSet.singleton r) output.
+Proof.
+  intros globals r output.
+  eapply unfold_all_Proper.
+  - reflexivity.
+  - cbn.
+    ResSetDecide.fsetdec.
+  - reflexivity.
+Qed.
+
 (* A version of `unfold_all`, using hints *)
 Inductive unfold_all_explicit (globals:Global.t):
   list (Resource.t * unpack_result) -> ResSet.t -> ResSet.t -> Prop :=
