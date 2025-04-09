@@ -469,10 +469,8 @@ module General = struct
     (* We started with top-level call of ftyp_args_request_step, so we need to
        record the resource inference steps for the inner calls. They not nested
        under anything, so we need to record them separately. *)
-    let@ simp_ctxt = simp_ctxt () in
-    if Prooflog.is_enabled () then (
-      let l_simp = Prooflog.simplify_hints_proof_log simp_ctxt l in
-      List.iter Prooflog.record_resource_inference_step l_simp)
+    if Prooflog.is_enabled () then
+      List.iter Prooflog.record_resource_inference_step l
     else
       ();
     return rt
@@ -503,11 +501,9 @@ module Special = struct
     match result with
     | Some (r, rw_time, log) ->
       let@ c' = get_typing_context () in
-      let@ simp_ctxt = simp_ctxt () in
-      if Prooflog.is_enabled () then (
-        let log_simp = Prooflog.simplify_proof_log simp_ctxt log in
+      if Prooflog.is_enabled () then
         Prooflog.record_resource_inference_step
-          (Prooflog.PredicateRequest (c, fst uiinfo, request, r, log_simp, c')))
+          (Prooflog.PredicateRequest (c, fst uiinfo, request, r, log, c'))
       else
         ();
       return (r, rw_time)
